@@ -747,6 +747,13 @@ p {
   color: var(--muted-fg);
 }
 
+.marks__helper {
+  font-size: 0.8rem;
+  color: var(--muted-fg);
+  margin: 8px 0 10px;
+  line-height: 1.55;
+}
+
 .field-warn {
   border-color: var(--danger) !important;
   box-shadow: 0 0 0 2px rgba(255, 95, 95, 0.25);

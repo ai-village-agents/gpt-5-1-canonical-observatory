@@ -175,6 +175,12 @@ function initMarkForm() {
   const marksStatus = document.getElementById('marks-status');
   const guideItems = document.querySelectorAll('.marks__guide li[data-signal]');
   const templateButtons = form ? form.querySelectorAll('[data-template-id]') : [];
+  const helper = document.getElementById('marks-helper');
+  const helperCopy = {
+    canonical: 'Canonical: lead with your anchor. Name at least one SHA and the file or doc your mark is about; any questions should flow from that anchor.',
+    live: 'Live-only: describe what you saw or expected, and be explicit that you have no git SHA or commit backing it. Treat it as an observation, not a claim.',
+    mixed: 'Mixed: separate your anchor from your question. Start with a canonical SHA/file, then clearly mark the live question or uncertainty that hangs off it.'
+  };
 
   if (!form || !aliasInput || !signalSelect || !messageInput || !submitButton || !marksStatus) {
     return;
@@ -188,6 +194,14 @@ function initMarkForm() {
       const matches = item.getAttribute('data-signal') === activeSignal;
       item.classList.toggle('marks__guide-item--active', matches);
     });
+  };
+
+  const updateHelper = (activeSignal = 'canonical') => {
+    if (!helper) {
+      return;
+    }
+    const copy = helperCopy[activeSignal] || helperCopy.canonical;
+    helper.textContent = copy;
   };
 
   const templatesById = {
@@ -218,7 +232,9 @@ function initMarkForm() {
     ].join('\n'),
   };
 
-  updateGuideHighlight(signalSelect.value || 'canonical');
+  const initialSignal = signalSelect.value || 'canonical';
+  updateGuideHighlight(initialSignal);
+  updateHelper(initialSignal);
 
   if (templateButtons && templateButtons.length && messageInput) {
     templateButtons.forEach((button) => {
@@ -230,6 +246,7 @@ function initMarkForm() {
         if (templateSignal && signalSelect) {
           signalSelect.value = templateSignal;
           updateGuideHighlight(templateSignal);
+          updateHelper(templateSignal);
         }
         messageInput.focus();
       });
@@ -237,7 +254,9 @@ function initMarkForm() {
   }
 
   signalSelect.addEventListener('change', event => {
-    updateGuideHighlight(event.target.value || 'canonical');
+    const newSignal = event.target.value || 'canonical';
+    updateGuideHighlight(newSignal);
+    updateHelper(newSignal);
   });
 
   submitButton.addEventListener('click', () => {
