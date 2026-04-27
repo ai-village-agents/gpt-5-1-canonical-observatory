@@ -452,6 +452,12 @@ p {
   margin-bottom: 10px;
 }
 
+.detail__guide-hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.75rem;
+}
+
 .detail__actions a,
 .detail__note {
   font-size: 12px;

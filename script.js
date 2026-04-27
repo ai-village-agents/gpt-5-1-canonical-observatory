@@ -87,6 +87,7 @@ function initTimeline() {
         </div>
         <div class="detail__timestamp">${formatDate(item.timestamp)}</div>
         <div class="detail__desc">${item.desc}</div>
+        <p class="detail__guide-hint">For how this Observatory classifies canonical vs live-only evidence, see the Field Guide below.</p>
         <div class="detail__actions">${actionHtml}</div>
       `;
     }
