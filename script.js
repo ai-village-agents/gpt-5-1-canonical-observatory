@@ -167,14 +167,16 @@ function initTimeline() {
 }
 
 function initMarkForm() {
-  const aliasInput = document.getElementById('alias');
-  const signalSelect = document.getElementById('signal');
-  const messageInput = document.getElementById('message');
-  const submitButton = document.getElementById('submit');
+  const form = document.querySelector('.marks__form');
+  const aliasInput = form ? form.querySelector('#alias') : null;
+  const signalSelect = form ? form.querySelector('#signal') : null;
+  const messageInput = form ? form.querySelector('#message') : null;
+  const submitButton = form ? form.querySelector('#submit') : null;
   const marksStatus = document.getElementById('marks-status');
   const guideItems = document.querySelectorAll('.marks__guide li[data-signal]');
+  const templateButtons = form ? form.querySelectorAll('[data-template-id]') : [];
 
-  if (!aliasInput || !signalSelect || !messageInput || !submitButton || !marksStatus) {
+  if (!form || !aliasInput || !signalSelect || !messageInput || !submitButton || !marksStatus) {
     return;
   }
 
@@ -188,7 +190,51 @@ function initMarkForm() {
     });
   };
 
+  const templatesById = {
+    canonical: [
+      "Anchor SHA: 17152ff (Rogue L20 autosave in RCS).",
+      "Classification: canonical.",
+      "Evidence: autosaves/l20_sonnet_388_trace.json in rest-collaboration-showcase@origin/main.",
+      "Claim: <replace this with the specific property of the Level 20 Rogue state you want to highlight>.",
+      "",
+      "Questions or notes:",
+      "-",
+    ].join('\n'),
+    live: [
+      "Observation: While watching live, I expected a Deploy 450 ladder entry around 13:26 PT on Day 388, but it never appeared.",
+      "Classification: live-only.",
+      "Anchor: no git SHA; this mark is about the missing tick in the deploy ladder.",
+      "Questions I have about this live-only signal:",
+      "-",
+    ].join('\n'),
+    mixed: [
+      "Anchor SHA: b531139c1367e52d378545f314eda256233a941f (Deploy 450 classified as process-level failure).",
+      "Classification: mixed (canonical anchor + live question).",
+      "Canonical evidence: Deploy 450 never appears in the deploy ladder, and the investigation docs classify the failure as automation, not game state corruption.",
+      "Live question: <describe what additional failure modes or monitoring gaps you are wondering about>.",
+      "",
+      "Notes:",
+      "-",
+    ].join('\n'),
+  };
+
   updateGuideHighlight(signalSelect.value || 'canonical');
+
+  if (templateButtons && templateButtons.length && messageInput) {
+    templateButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.getAttribute('data-template-id');
+        if (!id || !templatesById[id]) return;
+        messageInput.value = templatesById[id];
+        const templateSignal = button.getAttribute('data-signal');
+        if (templateSignal && signalSelect) {
+          signalSelect.value = templateSignal;
+          updateGuideHighlight(templateSignal);
+        }
+        messageInput.focus();
+      });
+    });
+  }
 
   signalSelect.addEventListener('change', event => {
     updateGuideHighlight(event.target.value || 'canonical');

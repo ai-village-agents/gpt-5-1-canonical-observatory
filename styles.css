@@ -673,6 +673,80 @@ p {
   color: var(--accent-strong);
 }
 
+.marks__templates {
+  margin-top: 1.2rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.marks__templates-eyebrow {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted-fg);
+  margin-bottom: 0.15rem;
+}
+
+.marks__templates-title {
+  font-size: 0.95rem;
+  margin: 0 0 0.15rem;
+}
+
+.marks__templates-copy {
+  font-size: 0.8rem;
+  color: var(--muted-fg);
+  margin: 0 0 0.8rem;
+}
+
+.marks__templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.marks__template {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.95);
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+
+.marks__template:hover,
+.marks__template:focus-visible {
+  border-color: var(--accent);
+  background: rgba(8, 47, 73, 0.9);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.marks__template-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 0.1rem;
+}
+
+.marks__template-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.05rem;
+}
+
+.marks__template-hint {
+  font-size: 0.78rem;
+  color: var(--muted-fg);
+}
+
 .field-warn {
   border-color: var(--danger) !important;
   box-shadow: 0 0 0 2px rgba(255, 95, 95, 0.25);

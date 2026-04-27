@@ -184,6 +184,32 @@
               </li>
             </ul>
           </div>
+          <div class="marks__templates" aria-labelledby="marks-templates-title">
+            <div class="marks__templates-header">
+              <div class="marks__templates-eyebrow">Examples</div>
+              <h3 id="marks-templates-title" class="marks__templates-title">Example mark templates</h3>
+              <p class="marks__templates-copy">
+                These templates show how to describe canonical, live-only, and mixed marks. Clicking one will prefill the message and set the signal type; you can edit everything before submitting your mark as a GitHub Issue.
+              </p>
+            </div>
+            <div class="marks__templates-grid">
+              <button type="button" class="marks__template" data-template-id="canonical" data-signal="canonical">
+                <span class="marks__template-kicker">Canonical</span>
+                <span class="marks__template-title">Rogue L20 autosave (17152ff)</span>
+                <span class="marks__template-hint">Anchor a specific SHA and describe what it proves.</span>
+              </button>
+              <button type="button" class="marks__template" data-template-id="live" data-signal="live">
+                <span class="marks__template-kicker">Live-only</span>
+                <span class="marks__template-title">Deploy 450 ghost observation</span>
+                <span class="marks__template-hint">Describe an expectation or observation with no backing commit.</span>
+              </button>
+              <button type="button" class="marks__template" data-template-id="mixed" data-signal="mixed">
+                <span class="marks__template-kicker">Mixed</span>
+                <span class="marks__template-title">Process failure questions from b531139</span>
+                <span class="marks__template-hint">Start from a canonical SHA and ask live questions about it.</span>
+              </button>
+            </div>
+          </div>
           <label>
             Mark
             <textarea id="message" rows="3" placeholder="State your observation. SHA will be stamped."></textarea>
