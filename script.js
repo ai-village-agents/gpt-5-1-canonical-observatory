@@ -1,3 +1,5 @@
+'use strict';
+
 const timelineData = [
   {
     title: 'Snapshot: Canonical branch sealed',
@@ -36,118 +38,148 @@ const timelineData = [
   }
 ];
 
-const timelineContainer = document.getElementById('timeline-grid');
-const chips = document.querySelectorAll('.chip');
-const lastCommitEl = document.getElementById('last-commit');
-const marksList = document.getElementById('marks-list');
+const GITHUB_ISSUES_URL = 'https://api.github.com/repos/ai-village-agents/gpt-5-1-canonical-observatory/issues?state=open&per_page=50';
 
 function formatDate(ts) {
   const date = new Date(ts);
   return date.toUTCString().replace('GMT', 'UTC');
 }
 
-function renderTimeline(filter = 'all') {
-  timelineContainer.innerHTML = '';
-
-  const filtered = timelineData.filter(item => filter === 'all' || item.type === filter);
-
-  filtered.forEach(item => {
-    const div = document.createElement('div');
-    div.className = `event event--${item.type}`;
-    div.innerHTML = `
-      <div class="event__type">
-        <span class="dot"></span>
-        <span class="pill ${item.type === 'canonical' ? 'pill--good' : 'pill--warn'}">${item.type}</span>
-      </div>
-      <div class="event__title">${item.title}</div>
-      <div class="event__sha">sha: ${item.sha}</div>
-      <div class="event__desc">${item.desc}</div>
-      <div class="event__meta">
-        <span>${formatDate(item.timestamp)}</span>
-        <span>${item.type === 'canonical' ? 'trusted' : 'quarantined'}</span>
-      </div>
-    `;
-    timelineContainer.appendChild(div);
-  });
-}
-
-function setActiveChip(target) {
-  chips.forEach(chip => chip.classList.toggle('active', chip === target));
-}
-
-chips.forEach(chip => {
-  chip.addEventListener('click', () => {
-    const filter = chip.getAttribute('data-filter');
-    setActiveChip(chip);
-    renderTimeline(filter === 'live' ? 'live' : filter);
-  });
-});
-
-function setLastCommit() {
-  const latestCanonical = timelineData.find(item => item.type === 'canonical');
-  lastCommitEl.textContent = latestCanonical ? latestCanonical.sha : 'n/a';
-}
-
-function pseudoSha(input) {
-  const seed = crypto.getRandomValues(new Uint32Array(4)).join('') + input;
-  let hash = 0;
-  for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash |= 0;
+function truncateBody(body) {
+  const clean = (body || '').replace(/\s+/g, ' ').trim();
+  if (clean.length <= 200) {
+    return clean;
   }
-  return Math.abs(hash).toString(16).padStart(8, '0') + '-' + crypto.randomUUID().slice(0, 8);
+  return `${clean.slice(0, 200)}...`;
 }
 
-function addMark(mark) {
-  const node = document.createElement('div');
-  node.className = 'mark';
-  node.innerHTML = `
-    <div class="mark__meta">
-      <span class="pill ${mark.type === 'canonical' ? 'pill--good' : 'pill--warn'}">${mark.type}</span>
-      <span class="hash">${mark.sha}</span>
-    </div>
-    <p><strong>${mark.alias}</strong>: ${mark.message}</p>
-  `;
-  if (marksList.firstElementChild?.classList.contains('placeholder')) {
-    marksList.innerHTML = '';
-  }
-  marksList.prepend(node);
-}
+function initTimeline() {
+  const timelineContainer = document.getElementById('timeline-grid');
+  const chips = document.querySelectorAll('.chip');
+  const lastCommitEl = document.getElementById('last-commit');
 
-function wireMarksForm() {
-  const aliasInput = document.getElementById('alias');
-  const signalInput = document.getElementById('signal');
-  const messageInput = document.getElementById('message');
-  const submit = document.getElementById('submit');
-
-  submit.addEventListener('click', () => {
-    const alias = (aliasInput.value || 'anon-observer').trim();
-    const type = signalInput.value;
-    const message = (messageInput.value || '').trim();
-
-    if (!message) {
-      messageInput.focus();
-      messageInput.classList.add('field-warn');
-      setTimeout(() => messageInput.classList.remove('field-warn'), 700);
+  const renderTimeline = (filter = 'all') => {
+    if (!timelineContainer) {
       return;
     }
 
-    addMark({
-      alias,
-      type,
-      message,
-      sha: `mark-sha:${pseudoSha(`${alias}-${message}`)}`
+    timelineContainer.innerHTML = '';
+    const filtered = timelineData.filter(item => filter === 'all' || item.type === filter);
+
+    filtered.forEach(item => {
+      const div = document.createElement('div');
+      div.className = `event event--${item.type}`;
+      div.innerHTML = `
+        <div class="event__type">
+          <span class="dot"></span>
+          <span class="pill ${item.type === 'canonical' ? 'pill--good' : 'pill--warn'}">${item.type}</span>
+        </div>
+        <div class="event__title">${item.title}</div>
+        <div class="event__sha">sha: ${item.sha}</div>
+        <div class="event__desc">${item.desc}</div>
+        <div class="event__meta">
+          <span>${formatDate(item.timestamp)}</span>
+          <span>${item.type === 'canonical' ? 'trusted' : 'quarantined'}</span>
+        </div>
+      `;
+      timelineContainer.appendChild(div);
+    });
+  };
+
+  const setActiveChip = target => {
+    chips.forEach(chip => chip.classList.toggle('active', chip === target));
+  };
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const filter = chip.getAttribute('data-filter');
+      setActiveChip(chip);
+      renderTimeline(filter === 'live' ? 'live' : filter);
+    });
+  });
+
+  renderTimeline('all');
+  if (chips.length) {
+    setActiveChip(chips[0]);
+  }
+
+  if (lastCommitEl) {
+    const latestCanonical = timelineData.find(item => item.type === 'canonical');
+    lastCommitEl.textContent = latestCanonical ? latestCanonical.sha : 'n/a';
+  }
+}
+
+async function loadMarks() {
+  const marksList = document.getElementById('marks-list');
+  const marksStatus = document.getElementById('marks-status');
+
+  if (!marksList || !marksStatus) {
+    return;
+  }
+
+  marksStatus.textContent = 'Loading marks from GitHub…';
+
+  try {
+    const response = await fetch(GITHUB_ISSUES_URL, {
+      headers: {
+        Accept: 'application/vnd.github+json'
+      }
     });
 
-    messageInput.value = '';
-  });
+    if (!response.ok) {
+      throw new Error(`GitHub request failed: ${response.status}`);
+    }
+
+    const issues = await response.json();
+
+    marksStatus.textContent = '';
+
+    if (!Array.isArray(issues) || issues.length === 0) {
+      marksStatus.textContent = 'No marks yet. Be the first to leave a permanent mark via GitHub Issues.';
+      return;
+    }
+
+    marksList.innerHTML = '';
+
+    issues.forEach(issue => {
+      const createdAt = issue?.created_at ? new Date(issue.created_at).toISOString().slice(0, 10) : 'unknown date';
+      const snippet = truncateBody(issue?.body || '');
+
+      const card = document.createElement('div');
+      card.className = 'mark mark-card';
+
+      const meta = document.createElement('div');
+      meta.className = 'mark__meta';
+
+      const titleLink = document.createElement('a');
+      titleLink.className = 'hash';
+      titleLink.href = issue?.html_url || '#';
+      titleLink.target = '_blank';
+      titleLink.rel = 'noopener noreferrer';
+      titleLink.textContent = issue?.title || 'Untitled mark';
+
+      const dateEl = document.createElement('span');
+      dateEl.textContent = createdAt;
+
+      meta.append(titleLink, dateEl);
+
+      const author = document.createElement('div');
+      author.className = 'mark__author';
+      author.textContent = `by ${issue?.user?.login || 'unknown'}`;
+
+      const bodyText = document.createElement('p');
+      bodyText.textContent = snippet || 'No details provided.';
+
+      card.append(meta, author, bodyText);
+      marksList.appendChild(card);
+    });
+  } catch (error) {
+    marksStatus.textContent = 'Unable to load marks. Check your network connection or GitHub API rate limits.';
+    console.error('Failed to load marks from GitHub Issues:', error);
+  }
 }
 
-function activate() {
-  renderTimeline();
-  setActiveChip(chips[0]);
-  setLastCommit();
-  wireMarksForm();
-}
-
-activate();
+document.addEventListener('DOMContentLoaded', () => {
+  loadMarks();
+  initTimeline();
+});
