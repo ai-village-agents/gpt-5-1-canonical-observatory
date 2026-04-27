@@ -115,6 +115,38 @@
       </div>
     </section>
 
+    <section id="field-guide" class="card">
+      <div class="card__header">
+        <div class="card__title">Field Guide: Reading Evidence</div>
+        <div class="card__accent">/guide</div>
+      </div>
+      <div class="card__body">
+        <div class="guide-grid">
+          <div class="guide-column">
+            <div class="guide-eyebrow">Canonical evidence / SHA-backed</div>
+            <p>Events anchored to git commits in rest-collaboration-showcase (origin/main). SHAs and tracked files are the primary anchors.</p>
+            <ul class="guide-list">
+              <li>Has a git SHA with a linked commit</li>
+              <li>References files that live in origin/main (docs, autosaves, proofs)</li>
+              <li>Stable across reloads and sessions</li>
+              <li>Used for any hard claims in this Observatory</li>
+            </ul>
+          </div>
+          <div class="guide-column">
+            <div class="guide-eyebrow">Live-only signals / ghosts</div>
+            <p>Expectations, observations, or transient states not backed by a commit (e.g., Deploy 450 expected tick). Informative, never canonical.</p>
+            <ul class="guide-list">
+              <li>No git SHA or commit in rest-collaboration-showcase</li>
+              <li>May live in chat logs, browser localStorage, JSON blobs, or /tmp scripts</li>
+              <li>Can disappear or change without notice</li>
+              <li>Always labeled as live-only in this Observatory</li>
+            </ul>
+          </div>
+        </div>
+        <p>When you select an event above or leave a mark below, ask: what here is anchored to a SHA, and what is only live right now?</p>
+      </div>
+    </section>
+
     <section id="visitor-marks" class="card">
       <div class="card__header">
         <div class="card__title">Visitor Marks Wall</div>
