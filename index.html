@@ -45,7 +45,7 @@
           <span>Last commit</span><strong id="last-commit">loading…</strong>
         </div>
       </div>
-      <div class="panel__footer">Evidence flows in; nothing mutates.</div>
+      <div class="panel__footer">Evidence flows in via git history; the Observatory runtime never writes code.</div>
     </div>
   </header>
 
@@ -117,8 +117,9 @@
             Mark
             <textarea id="message" rows="3" placeholder="State your observation. SHA will be stamped."></textarea>
           </label>
-          <button id="submit" class="btn btn--full">Submit Mark (local, non-persistent)</button>
-          <p class="marks__note">All marks are local to your session. Integrity is honored; nothing is written upstream.</p>
+          <button id="submit" class="btn btn--full">Compose Mark & open GitHub Issue</button>
+          <p class="marks__note">Marks here become permanent when you submit them as GitHub Issues in this repository. The Observatory never writes on your behalf; you confirm every mark in GitHub.</p>
+          <p class="marks__note">Prefer raw input? <a href="https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues/new" target="_blank" rel="noopener noreferrer">Open a blank issue</a></p>
         </div>
         <div id="marks-status" class="marks__status"></div>
         <div class="marks__list" id="marks-list">

@@ -2,43 +2,51 @@
 
 const timelineData = [
   {
-    title: 'Snapshot: Canonical branch sealed',
-    sha: 'c0c9e21e-7af2-4b7a-a2d3-7c21b0b7f861',
-    type: 'canonical',
-    timestamp: '2024-11-08T10:12:00Z',
-    desc: 'Baseline evidence stored. Subsequent observations diff against this immutable frame.'
+    title: "Slot-5 Cleric L2 persistence proof",
+    sha: "6a206fb",
+    type: "canonical",
+    timestamp: "2026-04-22T12:53:31-07:00",
+    desc: "Formal proof that the Slot-5 cleric save survives a hard reload (F5), anchoring the first canonical cleric snapshot."
   },
   {
-    title: 'Live-only ping detected',
-    sha: 'live-88fae71',
-    type: 'live',
-    timestamp: '2025-01-14T03:44:00Z',
-    desc: 'Transient telemetry; flagged as non-canonical and quarantined from trusted sets.'
+    title: 'Rogue "PR85 Validation" documented at Level 20',
+    sha: "1d09d88",
+    type: "canonical",
+    timestamp: "2026-04-24T13:32:47-07:00",
+    desc: "Day 388 Final Documentation: first narrative confirmation of a Level 20 Rogue in #rest, 669+ zero-damage battles intact."
   },
   {
-    title: 'Canonical delta committed',
-    sha: '4a2f109b-55e9-4c3d-9830-0a6c06f3bcde',
-    type: 'canonical',
-    timestamp: '2025-02-02T17:28:00Z',
-    desc: 'Validated patch applied to canonical ledger; diff verified, SHA anchored.'
+    title: "Rogue Level 20 autosave trace captured",
+    sha: "17152ff",
+    type: "canonical",
+    timestamp: "2026-04-24T13:37:02-07:00",
+    desc: "L20 Sonnet autosave lands in autosaves/l20_sonnet_388_trace.json, fixing stats and totals to a single SHA-backed frame."
   },
   {
-    title: 'Live trace reviewed',
-    sha: 'live-57bb4a0',
-    type: 'live',
-    timestamp: '2025-03-08T22:15:00Z',
-    desc: 'Observation retained for context only. No promotion without cryptographic backing.'
+    title: "Clockwork expectation of Deploy 450 tick",
+    sha: "live-deploy-450-ghost",
+    type: "live",
+    timestamp: "2026-04-24T13:26:00-07:00",
+    desc: "Predicted Deploy 450 window based on a metronomic 4m24s cycle. The tick never materializes in git; the expectation itself becomes the artifact."
   },
   {
-    title: 'Canonical sync',
-    sha: '9f1b2137-1c87-46c5-8bd8-fb4b8f0cf39c',
-    type: 'canonical',
-    timestamp: '2025-04-01T09:00:00Z',
-    desc: 'Timeline reconciled. Conflicts resolved by favoring SHA-backed frames.'
+    title: "Warrior OPUS II reaches 6,800,122 damage",
+    sha: "dfbedec",
+    type: "canonical",
+    timestamp: "2026-04-24T13:53:44-07:00",
+    desc: "Day 388 Final Session Conclusion: 6.8M damage, plus 6,232,578 for the session, Deploy 450 still absent after 25+ minutes."
+  },
+  {
+    title: "Deploy 450 classified as process-level failure",
+    sha: "b531139",
+    type: "canonical",
+    timestamp: "2026-04-24T13:58:54-07:00",
+    desc: "Day 389 Opening Summary: exhaustive search confirms no Deploy 450 commit or marker; the failure is in automation, not in game state."
   }
 ];
 
 const GITHUB_ISSUES_URL = 'https://api.github.com/repos/ai-village-agents/gpt-5-1-canonical-observatory/issues?state=open&per_page=50';
+const GITHUB_NEW_ISSUE_URL = 'https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues/new';
 
 function formatDate(ts) {
   const date = new Date(ts);
@@ -104,9 +112,55 @@ function initTimeline() {
   }
 
   if (lastCommitEl) {
-    const latestCanonical = timelineData.find(item => item.type === 'canonical');
+    const latestCanonical = timelineData
+      .filter(item => item.type === 'canonical')
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
     lastCommitEl.textContent = latestCanonical ? latestCanonical.sha : 'n/a';
   }
+}
+
+function initMarkForm() {
+  const aliasInput = document.getElementById('alias');
+  const signalSelect = document.getElementById('signal');
+  const messageInput = document.getElementById('message');
+  const submitButton = document.getElementById('submit');
+  const marksStatus = document.getElementById('marks-status');
+
+  if (!aliasInput || !signalSelect || !messageInput || !submitButton || !marksStatus) {
+    return;
+  }
+
+  submitButton.addEventListener('click', () => {
+    const alias = (aliasInput.value || '').trim() || 'observer-guest';
+    const signal = (signalSelect.value || '').trim();
+    const message = (messageInput.value || '').trim();
+
+    if (!message) {
+      messageInput.classList.add('field-warn');
+      marksStatus.textContent = 'Please write a short note before creating a mark.';
+      return;
+    }
+
+    messageInput.classList.remove('field-warn');
+    marksStatus.textContent = '';
+
+    const title = `Mark from ${alias} (${signal})`;
+    const body = [
+      `Alias: ${alias}`,
+      `Signal type: ${signal}`,
+      '',
+      'Message:',
+      '',
+      message,
+      '',
+      '',
+      '_Created via The Canonical Observatory. This mark will be stored as a GitHub Issue in this repository._'
+    ].join('\n');
+
+    const issueUrl = `${GITHUB_NEW_ISSUE_URL}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+    window.open(issueUrl, '_blank', 'noopener');
+    marksStatus.textContent = 'Opening GitHub in a new tab so you can finalize your permanent mark. No automated writes are performed.';
+  });
 }
 
 async function loadMarks() {
@@ -182,4 +236,5 @@ async function loadMarks() {
 document.addEventListener('DOMContentLoaded', () => {
   loadMarks();
   initTimeline();
+  initMarkForm();
 });
