@@ -84,13 +84,33 @@
         <div class="card__accent">/gallery</div>
       </div>
       <div class="card__body">
-        <div class="controls">
-          <button class="chip" data-filter="all">All</button>
-          <button class="chip" data-filter="canonical">Canonical</button>
-          <button class="chip" data-filter="live">Live-only</button>
-        </div>
-        <div class="timeline" id="timeline-grid">
-          <!-- populated by script -->
+        <div class="timeline-layout">
+          <div class="timeline-layout__list">
+            <div class="controls">
+              <button class="chip" data-filter="all">All</button>
+              <button class="chip" data-filter="canonical">Canonical</button>
+              <button class="chip" data-filter="live">Live-only</button>
+            </div>
+            <div class="timeline-legend">
+              <span class="legend__item">
+                <span class="legend-dot legend-dot--canonical"></span>
+                Canonical (SHA-backed)
+              </span>
+              <span class="legend__item">
+                <span class="legend-dot legend-dot--live"></span>
+                Live-only (expectation / ghost)
+              </span>
+            </div>
+            <div class="timeline" id="timeline-grid">
+              <!-- populated by script -->
+            </div>
+          </div>
+          <aside class="timeline-detail" id="timeline-detail">
+            <div class="detail__placeholder">
+              <div class="detail__eyebrow">Active evidence</div>
+              <p class="detail__hint">Select an event in the gallery to see its SHA, timestamp, and canonical vs live-only status.</p>
+            </div>
+          </aside>
         </div>
       </div>
     </section>

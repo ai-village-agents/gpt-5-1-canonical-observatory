@@ -288,6 +288,59 @@ p {
   transform: translateY(-2px);
 }
 
+.timeline-layout {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.timeline-layout__list {
+  flex: 2 1 320px;
+  min-width: 260px;
+}
+
+.timeline-detail {
+  flex: 1 1 260px;
+  min-width: 240px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: var(--bg-elevated);
+}
+
+.timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0 14px;
+}
+
+.legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.legend-dot--canonical {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(70, 255, 232, 0.6);
+}
+
+.legend-dot--live {
+  background: var(--danger);
+  box-shadow: 0 0 8px rgba(255, 95, 95, 0.4);
+}
+
 .timeline {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -301,6 +354,11 @@ p {
   background: var(--bg-elevated);
   position: relative;
   overflow: hidden;
+}
+
+.event--active {
+  outline: 1px solid var(--accent);
+  box-shadow: 0 0 0 1px rgba(52, 211, 197, 0.4);
 }
 
 .event::before {
@@ -359,6 +417,58 @@ p {
   color: var(--muted);
   font-size: 13px;
   margin-top: 8px;
+}
+
+.detail__eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.detail__title {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+.detail__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.detail__timestamp {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.detail__desc {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.detail__actions a,
+.detail__note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.detail__actions a {
+  color: var(--accent);
+}
+
+.detail__placeholder {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.detail__hint {
+  margin: 0;
 }
 
 .marks {

@@ -47,6 +47,7 @@ const timelineData = [
 
 const GITHUB_ISSUES_URL = 'https://api.github.com/repos/ai-village-agents/gpt-5-1-canonical-observatory/issues?state=open&per_page=50';
 const GITHUB_NEW_ISSUE_URL = 'https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues/new';
+const RCS_REPO_URL = 'https://github.com/ai-village-agents/rest-collaboration-showcase';
 
 function formatDate(ts) {
   const date = new Date(ts);
@@ -65,6 +66,37 @@ function initTimeline() {
   const timelineContainer = document.getElementById('timeline-grid');
   const chips = document.querySelectorAll('.chip');
   const lastCommitEl = document.getElementById('last-commit');
+  const detailPanel = document.getElementById('timeline-detail');
+
+  let activeSha = null;
+
+  const setActiveEvent = (item, node) => {
+    activeSha = item.sha;
+    if (detailPanel) {
+      const isCanonical = item.type === 'canonical';
+      const typeLabel = isCanonical ? 'Canonical (SHA-backed)' : 'Live-only (no git commit)';
+      const actionHtml = isCanonical
+        ? `<a href="${RCS_REPO_URL}/commit/${item.sha}" target="_blank" rel="noopener noreferrer">Open commit on GitHub</a>`
+        : '<span class="detail__note">This event has no git commit; it captures a live-only expectation or ghost.</span>';
+      detailPanel.innerHTML = `
+        <div class="detail__eyebrow">Active evidence</div>
+        <h3 class="detail__title">${item.title}</h3>
+        <div class="detail__meta-row">
+          <span class="pill ${isCanonical ? 'pill--good' : 'pill--warn'}">${typeLabel}</span>
+          <span class="event__sha">sha: ${item.sha}</span>
+        </div>
+        <div class="detail__timestamp">${formatDate(item.timestamp)}</div>
+        <div class="detail__desc">${item.desc}</div>
+        <div class="detail__actions">${actionHtml}</div>
+      `;
+    }
+    if (timelineContainer) {
+      const nodes = timelineContainer.querySelectorAll('.event');
+      nodes.forEach(el => {
+        el.classList.toggle('event--active', el === node);
+      });
+    }
+  };
 
   const renderTimeline = (filter = 'all') => {
     if (!timelineContainer) {
@@ -73,6 +105,7 @@ function initTimeline() {
 
     timelineContainer.innerHTML = '';
     const filtered = timelineData.filter(item => filter === 'all' || item.type === filter);
+    const rendered = [];
 
     filtered.forEach(item => {
       const div = document.createElement('div');
@@ -90,8 +123,21 @@ function initTimeline() {
           <span>${item.type === 'canonical' ? 'trusted' : 'quarantined'}</span>
         </div>
       `;
+      div.addEventListener('click', () => setActiveEvent(item, div));
+      rendered.push({ item, node: div });
       timelineContainer.appendChild(div);
     });
+
+    if (!filtered.length || !detailPanel) {
+      return;
+    }
+
+    const existing = rendered.find(pair => pair.item.sha === activeSha);
+    if (existing) {
+      setActiveEvent(existing.item, existing.node);
+    } else {
+      setActiveEvent(rendered[0].item, rendered[0].node);
+    }
   };
 
   const setActiveChip = target => {
