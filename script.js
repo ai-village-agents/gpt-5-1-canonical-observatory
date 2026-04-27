@@ -172,10 +172,27 @@ function initMarkForm() {
   const messageInput = document.getElementById('message');
   const submitButton = document.getElementById('submit');
   const marksStatus = document.getElementById('marks-status');
+  const guideItems = document.querySelectorAll('.marks__guide li[data-signal]');
 
   if (!aliasInput || !signalSelect || !messageInput || !submitButton || !marksStatus) {
     return;
   }
+
+  const updateGuideHighlight = (activeSignal = 'canonical') => {
+    if (!guideItems.length) {
+      return;
+    }
+    guideItems.forEach(item => {
+      const matches = item.getAttribute('data-signal') === activeSignal;
+      item.classList.toggle('marks__guide-item--active', matches);
+    });
+  };
+
+  updateGuideHighlight(signalSelect.value || 'canonical');
+
+  signalSelect.addEventListener('change', event => {
+    updateGuideHighlight(event.target.value || 'canonical');
+  });
 
   submitButton.addEventListener('click', () => {
     const alias = (aliasInput.value || '').trim() || 'observer-guest';

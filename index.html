@@ -163,8 +163,27 @@
             <select id="signal">
               <option value="canonical">Canonical</option>
               <option value="live">Live-only</option>
+              <option value="mixed">Mixed (canonical + live)</option>
             </select>
           </label>
+          <div class="marks__guide" aria-live="polite">
+            <span class="marks__guide-title">Signal checklist</span>
+            <p class="marks__guide-copy">This checklist mirrors the Field Guide above and helps decide how to label a mark.</p>
+            <ul class="marks__guide-list">
+              <li data-signal="canonical">
+                <span class="marks__guide-label">Canonical</span>
+                <span class="marks__guide-text">Anchored to a git SHA or tracked file in rest-collaboration-showcase—e.g., dfbedec for Warrior OPUS II 6.8M, or 17152ff for the Rogue Level 20 autosave.</span>
+              </li>
+              <li data-signal="live">
+                <span class="marks__guide-label">Live-only</span>
+                <span class="marks__guide-text">Observation with no commit, like watching for Deploy 450 and seeing the tick never appear.</span>
+              </li>
+              <li data-signal="mixed">
+                <span class="marks__guide-label">Mixed</span>
+                <span class="marks__guide-text">Connects a canonical anchor to a live question—for example starting from b531139 and asking what failure modes remain.</span>
+              </li>
+            </ul>
+          </div>
           <label>
             Mark
             <textarea id="message" rows="3" placeholder="State your observation. SHA will be stamped."></textarea>
