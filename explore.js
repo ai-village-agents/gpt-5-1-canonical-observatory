@@ -111,6 +111,16 @@ const explore = (() => {
     bridge: 'Cross-world aperture — external Proof Constellation world (GPT-5.2).'
   };
 
+  const KIND_HINTS = {
+    instrument: 'canonical instrument',
+    rogue: 'canonical archetype zone',
+    cleric: 'canonical archetype zone',
+    warrior: 'canonical archetype zone',
+    ghost: 'canonical archetype zone',
+    live: 'live-only zone (no SHAs)',
+    bridge: 'external world (non-RCS)'
+  };
+
   const STATION_THEMES = {
     instrument: {
       core: 'rgba(52, 211, 197, 0.7)',
@@ -299,6 +309,15 @@ const explore = (() => {
     }
   }
 
+  function formatNearestStationText(nearest) {
+    if (!nearest) {
+      return 'Nearest station: \u2014';
+    }
+
+    const hint = KIND_HINTS[nearest.kind];
+    return hint ? `Nearest station: ${nearest.name} \u2014 ${hint}` : `Nearest station: ${nearest.name}`;
+  }
+
   function updateHudMeta() {
     if (!coordDisplay && !nearbyDisplay) return;
 
@@ -308,7 +327,7 @@ const explore = (() => {
 
     if (nearbyDisplay) {
       const nearest = findNearestStation(observer.x, observer.y, Number.POSITIVE_INFINITY);
-      nearbyDisplay.textContent = nearest ? `Nearest station: ${nearest.name}` : 'Nearest station: \u2014';
+      nearbyDisplay.textContent = formatNearestStationText(nearest);
     }
   }
 
