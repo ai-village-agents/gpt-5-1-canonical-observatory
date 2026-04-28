@@ -46,11 +46,11 @@ p {
 .grid-overlay {
   position: fixed;
   inset: 0;
-  background-image: linear-gradient(rgba(52, 211, 197, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(52, 211, 197, 0.05) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(52, 211, 197, 0.035) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(52, 211, 197, 0.035) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.35;
   z-index: 0;
 }
 

@@ -2,6 +2,8 @@ const explore = (() => {
   const WORLD_WIDTH = 4000;
   const WORLD_HEIGHT = 3000;
   const GRID_SPACING = 200;
+  const MAX_TRAIL_POINTS = 220;
+  const TRAIL_MIN_DISTANCE = 8;
   const MOVE_SPEED = 275;
   const CLICK_RADIUS = 120;
   const PROXIMITY_RADIUS = 200;
@@ -76,6 +78,16 @@ const explore = (() => {
       x: 3400,
       y: 2600,
       link: '#timeline'
+    },
+    {
+      id: 'proof-bridge',
+      name: 'Proof Bridge',
+      role: 'Step through to GPT-5.2\'s Proof Constellation world.',
+      description: 'A cross-world aperture that opens GPT-5.2\'s Proof Constellation. This is an external, non-RCS world focused on proofs and marks; use it as a comparative vantage on persistence.',
+      kind: 'bridge',
+      x: 2000,
+      y: 2850,
+      link: 'https://ai-village-agents.github.io/gpt-5-2-world/'
     }
   ];
 
@@ -84,7 +96,8 @@ const explore = (() => {
     rogue: 'Incremental persistence — Rogue Level 20 autosave (17152ff).',
     cleric: 'Fragile but proven — Slot-5 Cleric Level 2 proof.',
     warrior: 'Exponential spike — Warrior OPUS II reaching 6.8M damage.',
-    ghost: 'Ghost of a pattern — Deploy-450 absence as evidence (b531139).'
+    ghost: 'Ghost of a pattern — Deploy-450 absence as evidence (b531139).',
+    bridge: 'Cross-world aperture — external Proof Constellation world (GPT-5.2).'
   };
 
   const STATION_THEMES = {
@@ -122,6 +135,13 @@ const explore = (() => {
       glow: 'rgba(163, 220, 255, 0.38)',
       glowActive: 'rgba(196, 236, 255, 0.62)',
       label: '#e6faff'
+    },
+    bridge: {
+      core: 'rgba(171, 207, 255, 0.72)',
+      coreActive: 'rgba(120, 236, 228, 0.94)',
+      glow: 'rgba(137, 200, 245, 0.36)',
+      glowActive: 'rgba(120, 236, 228, 0.6)',
+      label: '#e9f4ff'
     }
   };
 
@@ -140,6 +160,8 @@ const explore = (() => {
   let minimapCtx;
   let activeStation = null;
   let lastTime = 0;
+  let lastTrailPoint = null;
+  const trail = [];
 
   const observer = {
     x: 2000,
@@ -221,6 +243,13 @@ const explore = (() => {
 
     const archetypeLabel = station ? ARCHETYPE_LABELS[station.kind] || null : null;
     const archetypeMarkup = archetypeLabel ? `<p class="explore-detail__archetype">${archetypeLabel}</p>` : '';
+    const isAnchorLink = station && station.link ? station.link.startsWith('#') : true;
+    const href = station ? (isAnchorLink ? `index.html${station.link}` : station.link) : '';
+    const buttonLabel = station
+      ? isAnchorLink
+        ? `Open ${station.name} (index.html${station.link})`
+        : 'Open Proof Constellation (external world)'
+      : '';
 
     if (!station) {
       hudDetail.innerHTML = `
@@ -238,15 +267,17 @@ const explore = (() => {
         ${archetypeMarkup}
         <p class="explore-detail__desc">${station.description}</p>
         <p class="explore-detail__coords">Coordinates: ${Math.round(station.x)}, ${Math.round(station.y)}</p>
-        <button class="explore-detail__action" data-link="${station.link}">Open ${station.name} (index.html${station.link})</button>
+        <button class="explore-detail__action" data-href="${href}" data-external="${isAnchorLink ? 'false' : 'true'}">${buttonLabel}</button>
       </div>
     `;
 
     const button = hudDetail.querySelector('.explore-detail__action');
     if (button) {
       button.addEventListener('click', () => {
-        const href = `index.html${station.link}`;
-        window.open(href, '_blank');
+        const targetHref = button.getAttribute('data-href');
+        const isExternal = button.getAttribute('data-external') === 'true';
+        const destination = targetHref || (isExternal ? station.link : `index.html${station.link}`);
+        window.open(destination, '_blank');
       });
     }
   }
@@ -284,6 +315,7 @@ const explore = (() => {
       observer.y += (dirY / length) * delta;
       observer.x = clamp(observer.x, 0, WORLD_WIDTH);
       observer.y = clamp(observer.y, 0, WORLD_HEIGHT);
+      recordTrailPoint();
     }
 
     camera.x = clamp(observer.x - viewWidth / 2, 0, Math.max(WORLD_WIDTH - viewWidth, 0));
@@ -293,13 +325,16 @@ const explore = (() => {
 
   function drawGrid() {
     ctx.save();
-    ctx.strokeStyle = 'rgba(52, 211, 197, 0.08)';
-    ctx.lineWidth = 1;
+    const majorSpacing = 1000;
+    const tolerance = 0.001;
 
     const startX = Math.floor(camera.x / GRID_SPACING) * GRID_SPACING;
     const endX = camera.x + canvas.width;
     for (let x = startX; x <= endX; x += GRID_SPACING) {
       const screenX = x - camera.x;
+      const isMajor = Math.abs((x % majorSpacing)) < tolerance || Math.abs((x % majorSpacing) - majorSpacing) < tolerance;
+      ctx.strokeStyle = isMajor ? 'rgba(52, 211, 197, 0.16)' : 'rgba(52, 211, 197, 0.05)';
+      ctx.lineWidth = isMajor ? 1.4 : 1;
       ctx.beginPath();
       ctx.moveTo(screenX, 0);
       ctx.lineTo(screenX, canvas.height);
@@ -310,6 +345,9 @@ const explore = (() => {
     const endY = camera.y + canvas.height;
     for (let y = startY; y <= endY; y += GRID_SPACING) {
       const screenY = y - camera.y;
+      const isMajor = Math.abs((y % majorSpacing)) < tolerance || Math.abs((y % majorSpacing) - majorSpacing) < tolerance;
+      ctx.strokeStyle = isMajor ? 'rgba(52, 211, 197, 0.16)' : 'rgba(52, 211, 197, 0.05)';
+      ctx.lineWidth = isMajor ? 1.4 : 1;
       ctx.beginPath();
       ctx.moveTo(0, screenY);
       ctx.lineTo(canvas.width, screenY);
@@ -446,11 +484,52 @@ const explore = (() => {
     ctx.restore();
   }
 
+  function recordTrailPoint() {
+    const point = { x: observer.x, y: observer.y };
+    if (!lastTrailPoint) {
+      trail.push(point);
+      lastTrailPoint = point;
+    } else {
+      const dx = point.x - lastTrailPoint.x;
+      const dy = point.y - lastTrailPoint.y;
+      if (Math.hypot(dx, dy) >= TRAIL_MIN_DISTANCE) {
+        trail.push(point);
+        lastTrailPoint = point;
+      }
+    }
+
+    while (trail.length > MAX_TRAIL_POINTS) {
+      trail.shift();
+    }
+  }
+
+  function drawTrail() {
+    if (trail.length < 2) return;
+    ctx.save();
+    ctx.lineWidth = 1.2;
+    ctx.lineCap = 'round';
+
+    for (let i = 1; i < trail.length; i++) {
+      const prev = worldToScreen(trail[i - 1].x, trail[i - 1].y);
+      const curr = worldToScreen(trail[i].x, trail[i].y);
+      const age = i / (trail.length - 1);
+      const alpha = 0.08 + 0.22 * age;
+      ctx.strokeStyle = `rgba(70, 255, 232, ${alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.moveTo(prev.x, prev.y);
+      ctx.lineTo(curr.x, curr.y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
   function render() {
     ctx.fillStyle = '#0b1114';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     drawGrid();
+    drawTrail();
     drawStations();
     drawObserver();
     renderMinimap();
