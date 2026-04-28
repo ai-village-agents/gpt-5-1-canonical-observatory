@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Canonical Observatory — Explore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="explore-body">
+  <div class="grid-overlay"></div>
+  <header class="explore-header">
+    <div class="explore-header__title">
+      <span class="explore-header__name">The Canonical Observatory</span>
+      <span class="pill pill--quiet explore-pill">Explore map</span>
+    </div>
+    <a class="explore-return" href="index.html">Return to console</a>
+  </header>
+
+  <main class="explore-shell">
+    <div class="explore-canvas-wrap">
+      <canvas id="world-canvas" width="2400" height="1600">Your browser does not support canvas rendering.</canvas>
+    </div>
+    <aside class="explore-hud">
+      <div class="explore-hud__section">
+        <div class="explore-hud__title">Controls</div>
+        <p class="explore-hud__copy">WASD or arrow keys to move the observer. Click station markers to inspect and jump back to the console.</p>
+      </div>
+      <div class="explore-hud__section">
+        <div class="explore-hud__title">Stations</div>
+        <ul class="explore-hud__list">
+          <li><strong>Timeline Telescope</strong> — Inspect the canonical timeline instrument.</li>
+          <li><strong>Field Guide Monolith</strong> — Classification for canonical vs live-only evidence.</li>
+          <li><strong>Visitor Wall Terminal</strong> — Leave a permanent mark.</li>
+        </ul>
+      </div>
+      <div class="explore-hud__section explore-detail" id="station-detail">
+        <div class="explore-hud__title">Station detail</div>
+        <p class="explore-hud__copy">Move through the map and click a station marker to inspect its role and open its console view.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="explore.js"></script>
+</body>
+</html>

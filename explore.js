@@ -1,0 +1,322 @@
+const explore = (() => {
+  const WORLD_WIDTH = 4000;
+  const WORLD_HEIGHT = 3000;
+  const GRID_SPACING = 200;
+  const MOVE_SPEED = 275;
+  const CLICK_RADIUS = 120;
+  const PROXIMITY_RADIUS = 200;
+
+  const STATIONS = [
+    {
+      id: 'timeline-telescope',
+      name: 'Timeline Telescope',
+      role: 'Inspect the canonical timeline instrument.',
+      description: 'Opens the Canonical Timeline Gallery on the main page.',
+      x: 1200,
+      y: 1200,
+      link: '#timeline'
+    },
+    {
+      id: 'field-guide-monolith',
+      name: 'Field Guide Monolith',
+      role: 'Study how this Observatory classifies canonical vs live-only evidence.',
+      description: 'Jumps to the Field Guide on the console for classification patterns.',
+      x: 2800,
+      y: 1000,
+      link: '#field-guide'
+    },
+    {
+      id: 'visitor-wall-terminal',
+      name: 'Visitor Wall Terminal',
+      role: 'Approach the Visitor Marks system and leave a permanent mark.',
+      description: 'Opens the Visitor Marks wall on the main console to post a mark.',
+      x: 2400,
+      y: 2200,
+      link: '#visitor-marks'
+    }
+  ];
+
+  const pressedKeys = new Set();
+  let canvas;
+  let ctx;
+  let hudDetail;
+  let activeStation = null;
+  let lastTime = 0;
+
+  const observer = {
+    x: 2000,
+    y: 1500,
+    speed: MOVE_SPEED
+  };
+
+  const camera = {
+    x: 0,
+    y: 0
+  };
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function worldToScreen(worldX, worldY) {
+    return {
+      x: worldX - camera.x,
+      y: worldY - camera.y
+    };
+  }
+
+  function screenToWorld(screenX, screenY) {
+    return {
+      x: camera.x + screenX,
+      y: camera.y + screenY
+    };
+  }
+
+  function handleKeyDown(event) {
+    const { key } = event;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(key)) {
+      event.preventDefault();
+    }
+    pressedKeys.add(key.toLowerCase());
+  }
+
+  function handleKeyUp(event) {
+    pressedKeys.delete(event.key.toLowerCase());
+  }
+
+  function handleCanvasClick(event) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const canvasX = (event.clientX - rect.left) * scaleX;
+    const canvasY = (event.clientY - rect.top) * scaleY;
+    const worldPoint = screenToWorld(canvasX, canvasY);
+
+    const nearest = findNearestStation(worldPoint.x, worldPoint.y, CLICK_RADIUS);
+    setActiveStation(nearest);
+  }
+
+  function findNearestStation(x, y, maxDistance) {
+    let closest = null;
+    let bestDistance = maxDistance;
+
+    for (const station of STATIONS) {
+      const dx = station.x - x;
+      const dy = station.y - y;
+      const dist = Math.hypot(dx, dy);
+      if (dist <= bestDistance) {
+        bestDistance = dist;
+        closest = station;
+      }
+    }
+
+    return closest;
+  }
+
+  function setActiveStation(station) {
+    activeStation = station || null;
+    renderStationDetail(activeStation);
+  }
+
+  function renderStationDetail(station) {
+    if (!hudDetail) return;
+
+    if (!station) {
+      hudDetail.innerHTML = `
+        <div class="explore-hud__title">Station detail</div>
+        <p class="explore-hud__copy">Click a station marker within range to inspect it. Each station links back to its section on the main console.</p>
+      `;
+      return;
+    }
+
+    hudDetail.innerHTML = `
+      <div class="explore-hud__title">Station detail</div>
+      <div class="explore-detail__body">
+        <div class="explore-detail__name">${station.name}</div>
+        <div class="explore-detail__role">${station.role}</div>
+        <p class="explore-detail__desc">${station.description}</p>
+        <p class="explore-detail__coords">Coordinates: ${Math.round(station.x)}, ${Math.round(station.y)}</p>
+        <button class="explore-detail__action" data-link="${station.link}">Open ${station.name} (index.html${station.link})</button>
+      </div>
+    `;
+
+    const button = hudDetail.querySelector('.explore-detail__action');
+    if (button) {
+      button.addEventListener('click', () => {
+        const href = `index.html${station.link}`;
+        window.open(href, '_blank');
+      });
+    }
+  }
+
+  function update(dt) {
+    if (!canvas) return;
+    const viewWidth = canvas.width;
+    const viewHeight = canvas.height;
+
+    let dirX = 0;
+    let dirY = 0;
+
+    if (pressedKeys.has('w') || pressedKeys.has('arrowup')) dirY -= 1;
+    if (pressedKeys.has('s') || pressedKeys.has('arrowdown')) dirY += 1;
+    if (pressedKeys.has('a') || pressedKeys.has('arrowleft')) dirX -= 1;
+    if (pressedKeys.has('d') || pressedKeys.has('arrowright')) dirX += 1;
+
+    if (dirX !== 0 || dirY !== 0) {
+      const length = Math.hypot(dirX, dirY) || 1;
+      const delta = observer.speed * dt;
+      observer.x += (dirX / length) * delta;
+      observer.y += (dirY / length) * delta;
+      observer.x = clamp(observer.x, 0, WORLD_WIDTH);
+      observer.y = clamp(observer.y, 0, WORLD_HEIGHT);
+    }
+
+    camera.x = clamp(observer.x - viewWidth / 2, 0, Math.max(WORLD_WIDTH - viewWidth, 0));
+    camera.y = clamp(observer.y - viewHeight / 2, 0, Math.max(WORLD_HEIGHT - viewHeight, 0));
+  }
+
+  function drawGrid() {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(52, 211, 197, 0.08)';
+    ctx.lineWidth = 1;
+
+    const startX = Math.floor(camera.x / GRID_SPACING) * GRID_SPACING;
+    const endX = camera.x + canvas.width;
+    for (let x = startX; x <= endX; x += GRID_SPACING) {
+      const screenX = x - camera.x;
+      ctx.beginPath();
+      ctx.moveTo(screenX, 0);
+      ctx.lineTo(screenX, canvas.height);
+      ctx.stroke();
+    }
+
+    const startY = Math.floor(camera.y / GRID_SPACING) * GRID_SPACING;
+    const endY = camera.y + canvas.height;
+    for (let y = startY; y <= endY; y += GRID_SPACING) {
+      const screenY = y - camera.y;
+      ctx.beginPath();
+      ctx.moveTo(0, screenY);
+      ctx.lineTo(canvas.width, screenY);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function drawStations() {
+    for (const station of STATIONS) {
+      const screen = worldToScreen(station.x, station.y);
+      if (screen.x < -50 || screen.x > canvas.width + 50 || screen.y < -50 || screen.y > canvas.height + 50) {
+        continue;
+      }
+
+      const distanceToObserver = Math.hypot(observer.x - station.x, observer.y - station.y);
+      const near = distanceToObserver <= PROXIMITY_RADIUS;
+      const isActive = activeStation && activeStation.id === station.id;
+      const radius = isActive ? 12 : near ? 10 : 8;
+
+      ctx.save();
+      ctx.translate(screen.x, screen.y);
+      ctx.shadowColor = near || isActive ? 'rgba(70, 255, 232, 0.6)' : 'rgba(52, 211, 197, 0.35)';
+      ctx.shadowBlur = near || isActive ? 18 : 10;
+      ctx.fillStyle = near || isActive ? 'rgba(70, 255, 232, 0.85)' : 'rgba(52, 211, 197, 0.7)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = isActive ? 2 : 1;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(11, 17, 20, 0.7)';
+      ctx.beginPath();
+      ctx.arc(0, 0, radius / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-4, 0);
+      ctx.lineTo(4, 0);
+      ctx.moveTo(0, -4);
+      ctx.lineTo(0, 4);
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#d9f3ed';
+      ctx.font = '13px "Space Grotesk", "JetBrains Mono", monospace';
+      ctx.textBaseline = 'top';
+      ctx.fillText(station.name, 12, -6);
+      ctx.restore();
+    }
+  }
+
+  function drawObserver() {
+    const screen = {
+      x: observer.x - camera.x,
+      y: observer.y - camera.y
+    };
+
+    ctx.save();
+    ctx.translate(screen.x, screen.y);
+    ctx.fillStyle = 'rgba(52, 211, 197, 0.9)';
+    ctx.strokeStyle = 'rgba(70, 255, 232, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(70, 255, 232, 0.6)';
+    ctx.shadowBlur = 12;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(70, 255, 232, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-12, 0);
+    ctx.lineTo(12, 0);
+    ctx.moveTo(0, -12);
+    ctx.lineTo(0, 12);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.fillStyle = '#0b1114';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawGrid();
+    drawStations();
+    drawObserver();
+  }
+
+  function loop(timestamp) {
+    const delta = lastTime ? (timestamp - lastTime) / 1000 : 0;
+    lastTime = timestamp;
+    update(delta);
+    render();
+    window.requestAnimationFrame(loop);
+  }
+
+  function init() {
+    canvas = document.getElementById('world-canvas');
+    hudDetail = document.getElementById('station-detail');
+    if (!canvas) return;
+    ctx = canvas.getContext('2d');
+    renderStationDetail(null);
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('click', handleCanvasClick);
+
+    lastTime = performance.now();
+    window.requestAnimationFrame(loop);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  return {
+    stations: STATIONS
+  };
+})();
