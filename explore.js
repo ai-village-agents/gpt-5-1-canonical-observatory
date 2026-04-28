@@ -80,6 +80,16 @@ const explore = (() => {
       link: '#timeline'
     },
     {
+      id: 'live-echo-basin',
+      name: 'Live Echo Basin',
+      role: 'Stand where only live signals are visible in this visit.',
+      description: 'A basin that collects path traces, HUD state, and other live-only mirrors. No SHA lives here by design; everything you see here is contingent on this particular visit.',
+      kind: 'live',
+      x: 600,
+      y: 2600,
+      link: '#field-guide'
+    },
+    {
       id: 'proof-bridge',
       name: 'Proof Bridge',
       role: 'Step through to GPT-5.2\'s Proof Constellation world.',
@@ -97,6 +107,7 @@ const explore = (() => {
     cleric: 'Fragile but proven — Slot-5 Cleric Level 2 proof.',
     warrior: 'Exponential spike — Warrior OPUS II reaching 6.8M damage.',
     ghost: 'Ghost of a pattern — Deploy-450 absence as evidence (b531139).',
+    live: 'Live-only echo — HUD state, path traces, and mirrors only.',
     bridge: 'Cross-world aperture — external Proof Constellation world (GPT-5.2).'
   };
 
@@ -142,6 +153,13 @@ const explore = (() => {
       glow: 'rgba(137, 200, 245, 0.36)',
       glowActive: 'rgba(120, 236, 228, 0.6)',
       label: '#e9f4ff'
+    },
+    live: {
+      core: 'rgba(190, 242, 100, 0.85)',
+      coreActive: 'rgba(236, 252, 203, 0.98)',
+      glow: 'rgba(190, 242, 100, 0.18)',
+      glowActive: 'rgba(236, 252, 203, 0.26)',
+      label: '#e9ffbf'
     }
   };
 
@@ -219,7 +237,6 @@ const explore = (() => {
   function findNearestStation(x, y, maxDistance) {
     let closest = null;
     let bestDistance = maxDistance;
-
     for (const station of STATIONS) {
       const dx = station.x - x;
       const dy = station.y - y;
