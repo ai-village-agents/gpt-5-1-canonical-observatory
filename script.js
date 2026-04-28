@@ -318,7 +318,8 @@ async function loadMarks() {
     marksStatus.textContent = '';
 
     if (!Array.isArray(issues) || issues.length === 0) {
-      marksStatus.textContent = 'No marks yet. Be the first to leave a permanent mark via GitHub Issues.';
+      marksList.innerHTML = '';
+      marksStatus.innerHTML = 'Marks are canonically stored as <a href="https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues" target="_blank" rel="noopener noreferrer">GitHub Issues in this repository</a>. This wall can appear empty when the GitHub API response is unavailable or filtered; you can browse marks directly on GitHub even if the wall cannot load them.';
       return;
     }
 
