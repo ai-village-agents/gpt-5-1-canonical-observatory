@@ -12,6 +12,7 @@ const explore = (() => {
       name: 'Timeline Telescope',
       role: 'Inspect the canonical timeline instrument.',
       description: 'Opens the Canonical Timeline Gallery on the main page.',
+      kind: 'instrument',
       x: 1200,
       y: 1200,
       link: '#timeline'
@@ -21,6 +22,7 @@ const explore = (() => {
       name: 'Field Guide Monolith',
       role: 'Study how this Observatory classifies canonical vs live-only evidence.',
       description: 'Jumps to the Field Guide on the console for classification patterns.',
+      kind: 'instrument',
       x: 2800,
       y: 1000,
       link: '#field-guide'
@@ -30,6 +32,7 @@ const explore = (() => {
       name: 'Visitor Wall Terminal',
       role: 'Approach the Visitor Marks system and leave a permanent mark.',
       description: 'Opens the Visitor Marks wall on the main console to post a mark.',
+      kind: 'instrument',
       x: 2400,
       y: 2200,
       link: '#visitor-marks'
@@ -39,6 +42,7 @@ const explore = (() => {
       name: 'Rogue Chamber',
       role: 'Trace incremental persistence through the Rogue Level 20 autosave.',
       description: 'Focuses on the PR85 Validation Rogue and the long, low-damage grind anchored at autosaves/l20_sonnet_388_trace.json (17152ff).',
+      kind: 'rogue',
       x: 900,
       y: 2100,
       link: '#timeline'
@@ -48,6 +52,7 @@ const explore = (() => {
       name: 'Cleric Niche',
       role: 'Study the fragile but proven Slot-5 Cleric at Level 2.',
       description: 'Points back to docs/proofs/slot5_l2_persistence_proof.md and the evidence that the Cleric persists at Level 2 but not higher.',
+      kind: 'cleric',
       x: 3200,
       y: 2100,
       link: '#timeline'
@@ -57,6 +62,7 @@ const explore = (() => {
       name: 'Warrior Tower',
       role: 'Observe exponential damage growth via Warrior OPUS II.',
       description: 'Highlights the dfbedec narrative where OPUS II reaches 6,800,122 total damage, far beyond earlier baselines.',
+      kind: 'warrior',
       x: 2000,
       y: 600,
       link: '#timeline'
@@ -66,11 +72,63 @@ const explore = (() => {
       name: 'Deploy-450 Ghost Bay',
       role: 'Walk the shoreline where a missing ladder tick became evidence.',
       description: 'Encodes the Deploy 450 process-failure classification at b531139 as a ghost: absence of a ladder entry interpreted through canonical docs.',
+      kind: 'ghost',
       x: 3400,
       y: 2600,
       link: '#timeline'
     }
   ];
+
+  const ARCHETYPE_LABELS = {
+    instrument: null,
+    rogue: 'Incremental persistence — Rogue Level 20 autosave (17152ff).',
+    cleric: 'Fragile but proven — Slot-5 Cleric Level 2 proof.',
+    warrior: 'Exponential spike — Warrior OPUS II reaching 6.8M damage.',
+    ghost: 'Ghost of a pattern — Deploy-450 absence as evidence (b531139).'
+  };
+
+  const STATION_THEMES = {
+    instrument: {
+      core: 'rgba(52, 211, 197, 0.7)',
+      coreActive: 'rgba(70, 255, 232, 0.88)',
+      glow: 'rgba(52, 211, 197, 0.35)',
+      glowActive: 'rgba(70, 255, 232, 0.6)',
+      label: '#d9f3ed'
+    },
+    rogue: {
+      core: 'rgba(255, 186, 94, 0.78)',
+      coreActive: 'rgba(255, 210, 128, 0.92)',
+      glow: 'rgba(255, 173, 66, 0.38)',
+      glowActive: 'rgba(255, 201, 117, 0.66)',
+      label: '#ffe6b8'
+    },
+    cleric: {
+      core: 'rgba(168, 144, 255, 0.72)',
+      coreActive: 'rgba(198, 176, 255, 0.9)',
+      glow: 'rgba(140, 106, 255, 0.36)',
+      glowActive: 'rgba(184, 162, 255, 0.64)',
+      label: '#e4dcff'
+    },
+    warrior: {
+      core: 'rgba(255, 121, 82, 0.82)',
+      coreActive: 'rgba(255, 149, 112, 0.94)',
+      glow: 'rgba(255, 94, 40, 0.36)',
+      glowActive: 'rgba(255, 132, 86, 0.66)',
+      label: '#ffd4c5'
+    },
+    ghost: {
+      core: 'rgba(177, 227, 255, 0.64)',
+      coreActive: 'rgba(202, 240, 255, 0.86)',
+      glow: 'rgba(163, 220, 255, 0.38)',
+      glowActive: 'rgba(196, 236, 255, 0.62)',
+      label: '#e6faff'
+    }
+  };
+
+  function getStationTheme(station) {
+    const kind = station && station.kind ? station.kind : 'instrument';
+    return STATION_THEMES[kind] || STATION_THEMES.instrument;
+  }
 
   const pressedKeys = new Set();
   let canvas;
@@ -78,6 +136,8 @@ const explore = (() => {
   let hudDetail;
   let coordDisplay;
   let nearbyDisplay;
+  let minimapCanvas;
+  let minimapCtx;
   let activeStation = null;
   let lastTime = 0;
 
@@ -159,6 +219,9 @@ const explore = (() => {
   function renderStationDetail(station) {
     if (!hudDetail) return;
 
+    const archetypeLabel = station ? ARCHETYPE_LABELS[station.kind] || null : null;
+    const archetypeMarkup = archetypeLabel ? `<p class="explore-detail__archetype">${archetypeLabel}</p>` : '';
+
     if (!station) {
       hudDetail.innerHTML = `
         <div class="explore-hud__title">Station detail</div>
@@ -172,6 +235,7 @@ const explore = (() => {
       <div class="explore-detail__body">
         <div class="explore-detail__name">${station.name}</div>
         <div class="explore-detail__role">${station.role}</div>
+        ${archetypeMarkup}
         <p class="explore-detail__desc">${station.description}</p>
         <p class="explore-detail__coords">Coordinates: ${Math.round(station.x)}, ${Math.round(station.y)}</p>
         <button class="explore-detail__action" data-link="${station.link}">Open ${station.name} (index.html${station.link})</button>
@@ -257,6 +321,7 @@ const explore = (() => {
 
   function drawStations() {
     for (const station of STATIONS) {
+      const theme = getStationTheme(station);
       const screen = worldToScreen(station.x, station.y);
       if (screen.x < -50 || screen.x > canvas.width + 50 || screen.y < -50 || screen.y > canvas.height + 50) {
         continue;
@@ -269,9 +334,9 @@ const explore = (() => {
 
       ctx.save();
       ctx.translate(screen.x, screen.y);
-      ctx.shadowColor = near || isActive ? 'rgba(70, 255, 232, 0.6)' : 'rgba(52, 211, 197, 0.35)';
+      ctx.shadowColor = near || isActive ? theme.glowActive : theme.glow;
       ctx.shadowBlur = near || isActive ? 18 : 10;
-      ctx.fillStyle = near || isActive ? 'rgba(70, 255, 232, 0.85)' : 'rgba(52, 211, 197, 0.7)';
+      ctx.fillStyle = near || isActive ? theme.coreActive : theme.core;
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = isActive ? 2 : 1;
 
@@ -295,12 +360,59 @@ const explore = (() => {
       ctx.stroke();
 
       ctx.shadowBlur = 0;
-      ctx.fillStyle = '#d9f3ed';
+      ctx.fillStyle = theme.label || '#d9f3ed';
       ctx.font = '13px "Space Grotesk", "JetBrains Mono", monospace';
       ctx.textBaseline = 'top';
       ctx.fillText(station.name, 12, -6);
       ctx.restore();
     }
+  }
+
+  function renderMinimap() {
+    if (!minimapCtx || !minimapCanvas) return;
+
+    const width = minimapCanvas.width;
+    const height = minimapCanvas.height;
+    minimapCtx.clearRect(0, 0, width, height);
+
+    minimapCtx.fillStyle = 'rgba(7, 12, 16, 0.95)';
+    minimapCtx.fillRect(0, 0, width, height);
+
+    const padding = 10;
+    const innerWidth = width - padding * 2;
+    const innerHeight = height - padding * 2;
+    const scaleX = innerWidth / WORLD_WIDTH;
+    const scaleY = innerHeight / WORLD_HEIGHT;
+
+    minimapCtx.strokeStyle = 'rgba(52, 211, 197, 0.24)';
+    minimapCtx.lineWidth = 1.25;
+    minimapCtx.strokeRect(padding - 1, padding - 1, innerWidth + 2, innerHeight + 2);
+
+    for (const station of STATIONS) {
+      const theme = getStationTheme(station);
+      const isActive = activeStation && activeStation.id === station.id;
+      const x = padding + station.x * scaleX;
+      const y = padding + station.y * scaleY;
+      minimapCtx.fillStyle = isActive ? theme.coreActive : theme.core;
+      minimapCtx.beginPath();
+      minimapCtx.arc(x, y, isActive ? 4 : 3, 0, Math.PI * 2);
+      minimapCtx.fill();
+    }
+
+    const observerX = padding + observer.x * scaleX;
+    const observerY = padding + observer.y * scaleY;
+    minimapCtx.fillStyle = 'rgba(70, 255, 232, 0.95)';
+    minimapCtx.beginPath();
+    minimapCtx.arc(observerX, observerY, 4.5, 0, Math.PI * 2);
+    minimapCtx.fill();
+
+    minimapCtx.strokeStyle = 'rgba(70, 255, 232, 0.5)';
+    minimapCtx.lineWidth = 1;
+    const viewWidth = canvas ? canvas.width * scaleX : 0;
+    const viewHeight = canvas ? canvas.height * scaleY : 0;
+    const viewX = padding + camera.x * scaleX;
+    const viewY = padding + camera.y * scaleY;
+    minimapCtx.strokeRect(viewX, viewY, viewWidth, viewHeight);
   }
 
   function drawObserver() {
@@ -341,6 +453,7 @@ const explore = (() => {
     drawGrid();
     drawStations();
     drawObserver();
+    renderMinimap();
   }
 
   function loop(timestamp) {
@@ -356,6 +469,8 @@ const explore = (() => {
     hudDetail = document.getElementById('station-detail');
     coordDisplay = document.getElementById('coords-display');
     nearbyDisplay = document.getElementById('nearby-display');
+    minimapCanvas = document.getElementById('minimap-canvas');
+    minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
     if (!canvas) return;
     ctx = canvas.getContext('2d');
     renderStationDetail(null);

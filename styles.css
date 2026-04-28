@@ -972,6 +972,29 @@ p {
   margin: 4px 0 0;
 }
 
+.explore-minimap {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(52, 211, 197, 0.28);
+  background: radial-gradient(circle at 0% 0%, rgba(52, 211, 197, 0.16), transparent 55%),
+              rgba(15, 23, 42, 0.9);
+}
+
+.explore-minimap__label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.explore-minimap canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .explore-hud__list {
   list-style: none;
   padding: 0;
@@ -1001,6 +1024,14 @@ p {
 .explore-detail__role {
   font-size: 13px;
   color: var(--text);
+}
+
+.explore-detail__archetype {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  margin: 2px 0 2px;
 }
 
 .explore-detail__desc,
