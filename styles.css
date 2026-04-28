@@ -966,6 +966,12 @@ p {
   margin: 0;
 }
 
+.explore-hud__meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
 .explore-hud__list {
   list-style: none;
   padding: 0;

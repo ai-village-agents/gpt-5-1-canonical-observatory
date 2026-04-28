@@ -33,6 +33,42 @@ const explore = (() => {
       x: 2400,
       y: 2200,
       link: '#visitor-marks'
+    },
+    {
+      id: 'rogue-chamber',
+      name: 'Rogue Chamber',
+      role: 'Trace incremental persistence through the Rogue Level 20 autosave.',
+      description: 'Focuses on the PR85 Validation Rogue and the long, low-damage grind anchored at autosaves/l20_sonnet_388_trace.json (17152ff).',
+      x: 900,
+      y: 2100,
+      link: '#timeline'
+    },
+    {
+      id: 'cleric-niche',
+      name: 'Cleric Niche',
+      role: 'Study the fragile but proven Slot-5 Cleric at Level 2.',
+      description: 'Points back to docs/proofs/slot5_l2_persistence_proof.md and the evidence that the Cleric persists at Level 2 but not higher.',
+      x: 3200,
+      y: 2100,
+      link: '#timeline'
+    },
+    {
+      id: 'warrior-tower',
+      name: 'Warrior Tower',
+      role: 'Observe exponential damage growth via Warrior OPUS II.',
+      description: 'Highlights the dfbedec narrative where OPUS II reaches 6,800,122 total damage, far beyond earlier baselines.',
+      x: 2000,
+      y: 600,
+      link: '#timeline'
+    },
+    {
+      id: 'deploy-450-ghost-bay',
+      name: 'Deploy-450 Ghost Bay',
+      role: 'Walk the shoreline where a missing ladder tick became evidence.',
+      description: 'Encodes the Deploy 450 process-failure classification at b531139 as a ghost: absence of a ladder entry interpreted through canonical docs.',
+      x: 3400,
+      y: 2600,
+      link: '#timeline'
     }
   ];
 
@@ -40,6 +76,8 @@ const explore = (() => {
   let canvas;
   let ctx;
   let hudDetail;
+  let coordDisplay;
+  let nearbyDisplay;
   let activeStation = null;
   let lastTime = 0;
 
@@ -149,6 +187,19 @@ const explore = (() => {
     }
   }
 
+  function updateHudMeta() {
+    if (!coordDisplay && !nearbyDisplay) return;
+
+    if (coordDisplay) {
+      coordDisplay.textContent = `Position: ${Math.round(observer.x)}, ${Math.round(observer.y)}`;
+    }
+
+    if (nearbyDisplay) {
+      const nearest = findNearestStation(observer.x, observer.y, Number.POSITIVE_INFINITY);
+      nearbyDisplay.textContent = nearest ? `Nearest station: ${nearest.name}` : 'Nearest station: \u2014';
+    }
+  }
+
   function update(dt) {
     if (!canvas) return;
     const viewWidth = canvas.width;
@@ -173,6 +224,7 @@ const explore = (() => {
 
     camera.x = clamp(observer.x - viewWidth / 2, 0, Math.max(WORLD_WIDTH - viewWidth, 0));
     camera.y = clamp(observer.y - viewHeight / 2, 0, Math.max(WORLD_HEIGHT - viewHeight, 0));
+    updateHudMeta();
   }
 
   function drawGrid() {
@@ -302,9 +354,12 @@ const explore = (() => {
   function init() {
     canvas = document.getElementById('world-canvas');
     hudDetail = document.getElementById('station-detail');
+    coordDisplay = document.getElementById('coords-display');
+    nearbyDisplay = document.getElementById('nearby-display');
     if (!canvas) return;
     ctx = canvas.getContext('2d');
     renderStationDetail(null);
+    updateHudMeta();
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
