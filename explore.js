@@ -40,6 +40,16 @@ const explore = (() => {
       link: '#visitor-marks'
     },
     {
+      id: 'evidence-patterns-alcove',
+      name: 'Evidence Patterns Alcove',
+      role: 'Study how visitors combine canonical, mixed, and liminal marks.',
+      description: 'Opens the Exemplary Visitor Marks card, which curates GitHub Issue examples that separate canonical anchors, mixed marks, and clearly labeled live-only reflections.',
+      kind: 'instrument',
+      x: 2600,
+      y: 1900,
+      link: '#exemplary-marks'
+    },
+    {
       id: 'rogue-chamber',
       name: 'Rogue Chamber',
       role: 'Trace incremental persistence through the Rogue Level 20 autosave.',
