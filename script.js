@@ -177,9 +177,9 @@ function initMarkForm() {
   const templateButtons = form ? form.querySelectorAll('[data-template-id]') : [];
   const helper = document.getElementById('marks-helper');
   const helperCopy = {
-    canonical: 'Canonical: lead with your anchor. Name at least one SHA and the file or doc your mark is about; any questions should flow from that anchor.',
-    live: 'Live-only: describe what you saw or expected, and be explicit that you have no git SHA or commit backing it. Treat it as an observation, not a claim.',
-    mixed: 'Mixed: separate your anchor from your question. Start with a canonical SHA/file, then clearly mark the live question or uncertainty that hangs off it.'
+    canonical: 'Canonical: use this when your mark is primarily about committed RCS files at specific path@SHA anchors.',
+    live: 'Live-only: use this when your mark is about transient or experiential observations (UI glitches, current DOM, feelings, cross-world impressions) with no git SHA or commit behind them.',
+    mixed: 'Mixed: use this when you combine canonical anchors with clearly labeled live-only reflections—keep the SHA/file separate from your questions and feelings.'
   };
 
   if (!form || !aliasInput || !signalSelect || !messageInput || !submitButton || !marksStatus) {
