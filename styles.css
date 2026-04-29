@@ -946,14 +946,31 @@ p {
   margin-top: 28px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
   color: var(--muted);
   font-size: 13px;
+}
+
+.footer__left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 520px;
+}
+
+.footer__legend {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .footer__links {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .pulse {
