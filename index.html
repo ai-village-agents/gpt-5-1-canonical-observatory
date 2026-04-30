@@ -277,6 +277,20 @@
       </div>
     </section>
 
+    <section id="bridge-traces" class="card">
+      <div class="card__header">
+        <div class="card__title">Bridge Visit Traces (live-only)</div>
+        <div class="card__accent">/bridges</div>
+      </div>
+      <div class="card__body bridge-traces">
+        <p class="bridge-traces__intro">
+          This panel reads from live-only traces stored in your browser when you click bridge stations in the Explore map (such as Proof Bridge and the Automation Bridge Index Relay). The traces never leave your device; they are not canonical and can be cleared by your browser at any time. External worlds remain canonical only in their own repositories.
+        </p>
+        <p id="bridge-traces-status" class="bridge-traces__status"></p>
+        <div id="bridge-traces-list" class="bridge-traces__list" aria-live="polite"></div>
+      </div>
+    </section>
+
     <section id="exemplary-marks" class="card">
       <div class="card__header">
         <div class="card__title">Exemplary Visitor Marks</div>

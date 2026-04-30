@@ -518,8 +518,95 @@ async function loadMarks() {
   }
 }
 
+const BRIDGE_TRACE_STORAGE_KEY = 'co_bridge_traces_v1';
+
+function readBridgeTracesFromStorage() {
+  try {
+    const raw = window.localStorage ? window.localStorage.getItem(BRIDGE_TRACE_STORAGE_KEY) : null;
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('Bridge traces unavailable (localStorage error):', error);
+    return [];
+  }
+}
+
+function initBridgeTraces() {
+  const statusEl = document.getElementById('bridge-traces-status');
+  const listEl = document.getElementById('bridge-traces-list');
+  if (!statusEl || !listEl) {
+    return;
+  }
+
+  const traces = readBridgeTracesFromStorage();
+
+  if (!traces.length) {
+    statusEl.textContent = 'No bridge visits recorded in this browser yet. Traces are logged locally when you open bridge stations from the Explore map; they are live-only and not canonical.';
+    listEl.innerHTML = '';
+    return;
+  }
+
+  const aggregates = new Map();
+  traces.forEach(entry => {
+    const key = entry && entry.id ? entry.id : 'unknown';
+    const existing = aggregates.get(key) || {
+      id: entry.id || 'unknown',
+      name: entry.name || 'Unknown bridge',
+      destination: entry.destination || '',
+      count: 0,
+      lastTimestamp: entry.timestamp || null,
+    };
+    existing.count += 1;
+    if (entry.timestamp && (!existing.lastTimestamp || entry.timestamp > existing.lastTimestamp)) {
+      existing.lastTimestamp = entry.timestamp;
+    }
+    aggregates.set(key, existing);
+  });
+
+  const rows = Array.from(aggregates.values()).sort((a, b) => {
+    const at = a.lastTimestamp || '';
+    const bt = b.lastTimestamp || '';
+    return bt.localeCompare(at);
+  });
+
+  statusEl.textContent = 'These readings are live-only for this browser and derived from local bridge click traces; they do not alter RCS or any external canon.';
+  listEl.innerHTML = '';
+
+  rows.forEach(row => {
+    const item = document.createElement('article');
+    item.className = 'bridge-traces__item';
+
+    const title = document.createElement('h3');
+    title.className = 'bridge-traces__item-title';
+    title.textContent = row.name;
+
+    const meta = document.createElement('p');
+    meta.className = 'bridge-traces__item-meta';
+    const ts = row.lastTimestamp ? new Date(row.lastTimestamp).toUTCString().replace('GMT', 'UTC') : 'unknown time';
+    meta.textContent = `${row.count} visit${row.count === 1 ? '' : 's'} · last seen ${ts}`;
+
+    const dest = document.createElement('p');
+    dest.className = 'bridge-traces__item-dest';
+    if (row.destination) {
+      const link = document.createElement('a');
+      link.href = row.destination;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = row.destination;
+      dest.append('Destination: ', link);
+    } else {
+      dest.textContent = 'Destination: (unrecorded)';
+    }
+
+    item.append(title, meta, dest);
+    listEl.appendChild(item);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadMarks();
   initTimeline();
   initMarkForm();
+  initBridgeTraces();
 });

@@ -203,9 +203,52 @@ const explore = (() => {
     }
   };
 
+  const BRIDGE_TRACE_STORAGE_KEY = 'co_bridge_traces_v1';
+  const bridgeTraceBuffer = [];
+
   function getStationTheme(station) {
     const kind = station && station.kind ? station.kind : 'instrument';
     return STATION_THEMES[kind] || STATION_THEMES.instrument;
+  }
+
+  function recordBridgeTrace(station, destination) {
+    if (!station) {
+      return;
+    }
+
+    const entry = {
+      id: station.id,
+      name: station.name,
+      kind: station.kind,
+      destination,
+      timestamp: new Date().toISOString()
+    };
+
+    bridgeTraceBuffer.push(entry);
+    if (bridgeTraceBuffer.length > 40) {
+      bridgeTraceBuffer.splice(0, bridgeTraceBuffer.length - 40);
+    }
+
+    try {
+      if (!window.localStorage) {
+        return;
+      }
+      const raw = window.localStorage.getItem(BRIDGE_TRACE_STORAGE_KEY);
+      let stored = [];
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          stored = Array.isArray(parsed) ? parsed : [];
+        } catch (parseError) {
+          stored = [];
+        }
+      }
+      stored.push(entry);
+      const limited = stored.slice(-80);
+      window.localStorage.setItem(BRIDGE_TRACE_STORAGE_KEY, JSON.stringify(limited));
+    } catch (error) {
+      console.warn('Bridge trace storage unavailable:', error);
+    }
   }
 
   const pressedKeys = new Set();
@@ -334,6 +377,9 @@ const explore = (() => {
         const targetHref = button.getAttribute('data-href');
         const isExternal = button.getAttribute('data-external') === 'true';
         const destination = targetHref || (isExternal ? station.link : `index.html${station.link}`);
+        if (station && station.kind === 'bridge') {
+          recordBridgeTrace(station, destination);
+        }
         window.open(destination, '_blank');
       });
     }
