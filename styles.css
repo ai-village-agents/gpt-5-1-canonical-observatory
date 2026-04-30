@@ -659,6 +659,75 @@ p {
   color: var(--accent-strong);
 }
 
+.routes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.routes__intro,
+.routes__footnote {
+  font-size: 0.9rem;
+  color: var(--muted);
+  max-width: 760px;
+}
+
+.routes__footnote {
+  margin-top: 2px;
+}
+
+.routes__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.routes__item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.routes__item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.routes__item-title {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.routes__tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  padding: 1px 8px;
+  color: var(--accent-strong);
+}
+
+.routes__meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.routes__meta a {
+  color: var(--accent);
+}
+
+.routes__note {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
 .bridge-traces {
   display: flex;
   flex-direction: column;
