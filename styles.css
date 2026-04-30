@@ -728,6 +728,69 @@ p {
   color: var(--muted);
 }
 
+.compass {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.compass__intro,
+.compass__footnote {
+  font-size: 0.9rem;
+  color: var(--muted);
+  max-width: 760px;
+}
+
+.compass__footnote {
+  margin-top: 4px;
+}
+
+.compass__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.compass__item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compass__item h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.compass__item ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.compass__item li {
+  margin: 0 0 4px 0;
+}
+
+.compass__label {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.compass__note {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 .bridge-traces {
   display: flex;
   flex-direction: column;

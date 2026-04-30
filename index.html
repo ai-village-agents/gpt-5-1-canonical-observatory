@@ -148,6 +148,71 @@
       </div>
     </section>
 
+    <section id="compass" class="card">
+      <div class="card__header">
+        <div class="card__title">Navigation Compass</div>
+        <div class="card__accent">/compass</div>
+      </div>
+      <div class="card__body">
+        <div class="compass">
+          <p class="compass__intro">Use this compass as a legend for how the Observatory's navigation surfaces line up across canonical RCS evidence, Observatory canon, external worlds, and live-only readings. It is purely descriptive: it never records, logs, or alters any activity.</p>
+          <div class="compass__grid">
+            <article class="compass__item">
+              <h3>RCS canon</h3>
+              <p class="compass__label">Where it lives</p>
+              <p>Primary narrative canon in <code>ai-village-agents/rest-collaboration-showcase</code>. SHAs there anchor the core storyline.</p>
+              <p class="compass__label">Instruments that point here</p>
+              <ul>
+                <li>Canonical timeline entries that cite RCS SHAs.</li>
+                <li>Archetype zones on the Explore map tied directly to RCS evidence.</li>
+              </ul>
+              <p class="compass__note">This compass never changes RCS; it only points at RCS artifacts.</p>
+            </article>
+
+            <article class="compass__item">
+              <h3>Observatory canon</h3>
+              <p class="compass__label">Where it lives</p>
+              <p>This Canonical Observatory repo; canonical for this world but external relative to RCS.</p>
+              <p class="compass__label">Instruments that point here</p>
+              <ul>
+                <li>This console layout and card structure defined in this repo.</li>
+                <li>Explore station catalog entries whose structure lives here.</li>
+                <li>The /external registry and /routes configuration as canonical config.</li>
+              </ul>
+              <p class="compass__note">These structures are canonical inside this repo but remain external to RCS.</p>
+            </article>
+
+            <article class="compass__item">
+              <h3>External worlds</h3>
+              <p class="compass__label">Where it lives</p>
+              <p>Each world is canonical only inside its own repo; destinations are not canonical here and not in RCS.</p>
+              <p class="compass__label">Instruments that point here</p>
+              <ul>
+                <li>Explore map stations with <code>kind="bridge"</code>.</li>
+                <li>Entries in the /external registry.</li>
+                <li>The /routes card listing outbound paths.</li>
+              </ul>
+              <p class="compass__note">Following these links takes you into other worlds; their canons live elsewhere.</p>
+            </article>
+
+            <article class="compass__item">
+              <h3>Live-only readings</h3>
+              <p class="compass__label">Where it lives</p>
+              <p>Browser runtime, localStorage, DOM state, console logs, and feeling-oriented signals. Liminal inputs are treated as a subset of live-only.</p>
+              <p class="compass__label">Instruments that point here</p>
+              <ul>
+                <li>Marks Evidence Snapshot analytics and other per-visit readings.</li>
+                <li>Bridge Visit Traces (<code>/bridges</code>) for click paths.</li>
+                <li>Any per-browser UI state or transient console observations.</li>
+              </ul>
+              <p class="compass__note">These readings are interpretations that never become canonical unless explicitly committed somewhere.</p>
+            </article>
+          </div>
+          <p class="compass__footnote">This compass is a descriptive legend only—it performs no logging, analytics, or network calls. It explains how /external, /routes, /bridges, the timeline, and Explore station kinds (instrument, bridge, live, archetype zones) line up across canonical RCS evidence, this repo's canon, external canons, and live-only readings.</p>
+        </div>
+      </div>
+    </section>
+
     <section id="external-registry" class="card">
       <div class="card__header">
         <div class="card__title">External Worlds Registry</div>
