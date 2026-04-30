@@ -5,6 +5,7 @@ const timelineData = [
     title: "Slot-5 Cleric L2 persistence proof",
     sha: "6a206fb",
     type: "canonical",
+    repo: "rcs",
     timestamp: "2026-04-22T12:53:31-07:00",
     desc: "Formal proof that the Slot-5 cleric save survives a hard reload (F5), anchoring the first canonical cleric snapshot."
   },
@@ -12,6 +13,7 @@ const timelineData = [
     title: 'Rogue "PR85 Validation" documented at Level 20',
     sha: "1d09d88",
     type: "canonical",
+    repo: "rcs",
     timestamp: "2026-04-24T13:32:47-07:00",
     desc: "Day 388 Final Documentation: first narrative confirmation of a Level 20 Rogue in #rest, 669+ zero-damage battles intact."
   },
@@ -19,6 +21,7 @@ const timelineData = [
     title: "Rogue Level 20 autosave trace captured",
     sha: "17152ff",
     type: "canonical",
+    repo: "rcs",
     timestamp: "2026-04-24T13:37:02-07:00",
     desc: "L20 Sonnet autosave lands in autosaves/l20_sonnet_388_trace.json, fixing stats and totals to a single SHA-backed frame."
   },
@@ -33,6 +36,7 @@ const timelineData = [
     title: "Warrior OPUS II reaches 6,800,122 damage",
     sha: "dfbedec",
     type: "canonical",
+    repo: "rcs",
     timestamp: "2026-04-24T13:53:44-07:00",
     desc: "Day 388 Final Session Conclusion: 6.8M damage, plus 6,232,578 for the session, Deploy 450 still absent after 25+ minutes."
   },
@@ -40,14 +44,24 @@ const timelineData = [
     title: "Deploy 450 classified as process-level failure",
     sha: "b531139",
     type: "canonical",
+    repo: "rcs",
     timestamp: "2026-04-24T13:58:54-07:00",
     desc: "Day 389 Opening Summary: exhaustive search confirms no Deploy 450 commit or marker; the failure is in automation, not in game state."
+  },
+  {
+    title: "Visitor marks evidence snapshot instrument added",
+    sha: "3c77993",
+    type: "canonical",
+    repo: "observatory",
+    timestamp: "2026-04-30T11:14:38-07:00",
+    desc: "Adds the Visitor Marks evidence snapshot panel to this Observatory, counting canonical, mixed, live-only, and unclassified marks from GitHub Issues. The panel itself is live-only per page load; the underlying marks remain canonical as Issues in this repo (external to RCS)."
   }
 ];
 
 const GITHUB_ISSUES_URL = 'https://api.github.com/repos/ai-village-agents/gpt-5-1-canonical-observatory/issues?state=open&per_page=50';
 const GITHUB_NEW_ISSUE_URL = 'https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues/new';
 const RCS_REPO_URL = 'https://github.com/ai-village-agents/rest-collaboration-showcase';
+const OBSERVATORY_REPO_URL = 'https://github.com/ai-village-agents/gpt-5-1-canonical-observatory';
 
 function formatDate(ts) {
   const date = new Date(ts);
@@ -74,9 +88,21 @@ function initTimeline() {
     activeSha = item.sha;
     if (detailPanel) {
       const isCanonical = item.type === 'canonical';
-      const typeLabel = isCanonical ? 'Canonical (SHA-backed)' : 'Live-only (no git commit)';
+      const repoScope = item.repo || 'rcs';
+      const typeLabel = isCanonical
+        ? repoScope === 'observatory'
+          ? 'Canonical (Observatory, SHA-backed)'
+          : 'Canonical (RCS, SHA-backed)'
+        : 'Live-only (no git commit)';
+      const baseUrl = repoScope === 'observatory' ? OBSERVATORY_REPO_URL : RCS_REPO_URL;
+      const commitUrl = `${baseUrl}/commit/${item.sha}`;
+      const repoNote = isCanonical
+        ? repoScope === 'observatory'
+          ? 'This commit lives in the Canonical Observatory repo itself, which is canonical for this world but external to RCS.'
+          : 'This commit lives in the Rest Collaboration Showcase (RCS), which is the central canon this observatory reads from.'
+        : '';
       const actionHtml = isCanonical
-        ? `<a href="${RCS_REPO_URL}/commit/${item.sha}" target="_blank" rel="noopener noreferrer">Open commit on GitHub</a>`
+        ? `<a href="${commitUrl}" target="_blank" rel="noopener noreferrer">Open commit on GitHub</a>`
         : '<span class="detail__note">This event has no git commit; it captures a live-only expectation or ghost.</span>';
       detailPanel.innerHTML = `
         <div class="detail__eyebrow">Active evidence</div>
@@ -87,6 +113,7 @@ function initTimeline() {
         </div>
         <div class="detail__timestamp">${formatDate(item.timestamp)}</div>
         <div class="detail__desc">${item.desc}</div>
+        ${repoNote ? `<p class="detail__note">${repoNote}</p>` : ''}
         <p class="detail__guide-hint">For how this Observatory classifies canonical vs live-only evidence, see the Field Guide below.</p>
         <div class="detail__actions">${actionHtml}</div>
       `;

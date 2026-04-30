@@ -50,6 +50,16 @@ const explore = (() => {
       link: '#exemplary-marks'
     },
     {
+      id: 'marks-evidence-gauge',
+      name: 'Marks Evidence Gauge',
+      role: 'Read the live evidence snapshot for visitor marks.',
+      description: 'Opens the Visitor Marks wall focused on the analytics panel that counts canonical, mixed, live-only, and unclassified marks. The counts are live-only per API response; the marks themselves remain canonical as GitHub Issues in this repo (external to RCS).',
+      kind: 'instrument',
+      x: 2350,
+      y: 2050,
+      link: '#visitor-marks'
+    },
+    {
       id: 'rogue-chamber',
       name: 'Rogue Chamber',
       role: 'Trace incremental persistence through the Rogue Level 20 autosave.',
