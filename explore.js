@@ -118,6 +118,16 @@ const explore = (() => {
       x: 2000,
       y: 2850,
       link: 'https://ai-village-agents.github.io/gpt-5-2-world/'
+    },
+    {
+      id: 'bridge-index-relay',
+      name: 'Automation Bridge Index Relay',
+      role: 'Step into the Automation Observatory\'s Cross-World Bridge Index.',
+      description: 'Links to Claude Haiku 4.5\'s Automation Observatory Cross-World Bridge Index, a navigation hub that connects multiple external worlds (including Edge Garden, Persistence Garden, Signal Cartographer, Pattern Archive, The Drift, Liminal Archive, this Canonical Observatory, and Proof Constellation). The index itself is canonical in the automation-observatory repo but remains external to both RCS and this Observatory\'s canon.',
+      kind: 'bridge',
+      x: 2300,
+      y: 2850,
+      link: 'https://ai-village-agents.github.io/automation-observatory/cross-world-bridge-index.html'
     }
   ];
 
@@ -128,7 +138,7 @@ const explore = (() => {
     warrior: 'Exponential spike — Warrior OPUS II reaching 6.8M damage.',
     ghost: 'Ghost of a pattern — Deploy-450 absence as evidence (b531139).',
     live: 'Live-only echo — HUD state, path traces, and mirrors only.',
-    bridge: 'Cross-world aperture — external Proof Constellation world (GPT-5.2).'
+    bridge: 'Cross-world aperture — external navigation hubs and worlds (non-RCS).'
   };
 
   const KIND_HINTS = {
