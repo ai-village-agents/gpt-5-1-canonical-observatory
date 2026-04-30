@@ -292,6 +292,69 @@ function initMarkForm() {
   });
 }
 
+function normalizeSignalToken(raw) {
+  if (!raw) {
+    return null;
+  }
+  const token = String(raw).toLowerCase().trim();
+  if (token.startsWith('canon')) {
+    return 'canonical';
+  }
+  if (token.startsWith('mix')) {
+    return 'mixed';
+  }
+  if (token.includes('live')) {
+    return 'live';
+  }
+  return null;
+}
+
+function deriveSignalTypeFromIssue(issue = {}) {
+  const body = String(issue.body || '');
+  const title = String(issue.title || '');
+
+  const bodyMatch = body.match(/signal type:\s*([^\n\r]+)/i);
+  if (bodyMatch && bodyMatch[1]) {
+    const normalized = normalizeSignalToken(bodyMatch[1]);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  const titleMatch = title.match(/mark from[^()]*\(\s*([^)]+)\s*\)/i);
+  if (titleMatch && titleMatch[1]) {
+    const normalized = normalizeSignalToken(titleMatch[1]);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return 'unknown';
+}
+
+function createSignalPill(signalType) {
+  const normalized = normalizeSignalToken(signalType);
+  if (!normalized) {
+    return null;
+  }
+
+  const pill = document.createElement('span');
+  pill.className = `mark__pill mark__pill--${normalized}`;
+
+  if (normalized === 'canonical') {
+    pill.textContent = 'Canonical';
+    pill.title = 'Canonical: references committed RCS files at specific path@SHA anchors.';
+  } else if (normalized === 'live') {
+    pill.textContent = 'Live-only';
+    pill.title = 'Live-only: about transient or experiential observations (including liminal) with no SHA behind them.';
+  } else {
+    pill.textContent = 'Mixed';
+    pill.title = 'Mixed: combines canonical path@SHA anchors with clearly labeled live-only reflections.';
+  }
+
+  return pill;
+}
+
 async function loadMarks() {
   const marksList = document.getElementById('marks-list');
   const marksStatus = document.getElementById('marks-status');
@@ -328,12 +391,16 @@ async function loadMarks() {
     issues.forEach(issue => {
       const createdAt = issue?.created_at ? new Date(issue.created_at).toISOString().slice(0, 10) : 'unknown date';
       const snippet = truncateBody(issue?.body || '');
+      const signalType = deriveSignalTypeFromIssue(issue);
 
       const card = document.createElement('div');
       card.className = 'mark mark-card';
 
       const meta = document.createElement('div');
       meta.className = 'mark__meta';
+
+      const metaMain = document.createElement('div');
+      metaMain.className = 'mark__meta-main';
 
       const titleLink = document.createElement('a');
       titleLink.className = 'hash';
@@ -342,10 +409,21 @@ async function loadMarks() {
       titleLink.rel = 'noopener noreferrer';
       titleLink.textContent = issue?.title || 'Untitled mark';
 
+      const metaAside = document.createElement('div');
+      metaAside.className = 'mark__meta-aside';
+
+      const pill = createSignalPill(signalType);
+
       const dateEl = document.createElement('span');
+      dateEl.className = 'mark__date';
       dateEl.textContent = createdAt;
 
-      meta.append(titleLink, dateEl);
+      metaMain.append(titleLink);
+      if (pill) {
+        metaAside.append(pill);
+      }
+      metaAside.append(dateEl);
+      meta.append(metaMain, metaAside);
 
       const author = document.createElement('div');
       author.className = 'mark__author';
