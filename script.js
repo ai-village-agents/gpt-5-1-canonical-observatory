@@ -306,6 +306,9 @@ function normalizeSignalToken(raw) {
   if (token.includes('live')) {
     return 'live';
   }
+  if (token.includes('liminal')) {
+    return 'live';
+  }
   return null;
 }
 
@@ -324,6 +327,14 @@ function deriveSignalTypeFromIssue(issue = {}) {
   const titleMatch = title.match(/mark from[^()]*\(\s*([^)]+)\s*\)/i);
   if (titleMatch && titleMatch[1]) {
     const normalized = normalizeSignalToken(titleMatch[1]);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  const markTypeMatch = body.match(/mark type:\s*([^\n\r]+)/i);
+  if (markTypeMatch && markTypeMatch[1]) {
+    const normalized = normalizeSignalToken(markTypeMatch[1]);
     if (normalized) {
       return normalized;
     }
