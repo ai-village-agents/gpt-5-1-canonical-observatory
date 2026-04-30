@@ -53,7 +53,7 @@ const explore = (() => {
       id: 'marks-evidence-gauge',
       name: 'Marks Evidence Gauge',
       role: 'Read the live evidence snapshot for visitor marks.',
-      description: 'Opens the Visitor Marks wall focused on the analytics panel that counts canonical, mixed, live-only, and unclassified marks. The counts are live-only per API response; the marks themselves remain canonical as GitHub Issues in this repo (external to RCS).',
+      description: 'Opens the Visitor Marks wall focused on the analytics panel that presents a live-only evidence snapshot of counts for canonical, mixed, live-only, and unclassified marks. Counts are live-only per GitHub API response while the underlying marks remain canonical GitHub Issues in this repo, which is canonical for the Observatory but external to RCS.',
       kind: 'instrument',
       x: 2350,
       y: 2050,
@@ -132,7 +132,7 @@ const explore = (() => {
   };
 
   const KIND_HINTS = {
-    instrument: 'canonical instrument',
+    instrument: 'canonical instrument (some surface live-only readings from canonical data)',
     rogue: 'canonical archetype zone',
     cleric: 'canonical archetype zone',
     warrior: 'canonical archetype zone',

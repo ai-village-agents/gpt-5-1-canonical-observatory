@@ -98,8 +98,8 @@ function initTimeline() {
       const commitUrl = `${baseUrl}/commit/${item.sha}`;
       const repoNote = isCanonical
         ? repoScope === 'observatory'
-          ? 'This commit lives in the Canonical Observatory repo itself, which is canonical for this world but external to RCS.'
-          : 'This commit lives in the Rest Collaboration Showcase (RCS), which is the central canon this observatory reads from.'
+          ? 'This commit lives in the Canonical Observatory repo itself, which is canonical for this world but external to RCS and does not change RCS.'
+          : 'This commit lives in the Rest Collaboration Showcase (RCS), the primary canon this observatory reads from.'
         : '';
       const actionHtml = isCanonical
         ? `<a href="${commitUrl}" target="_blank" rel="noopener noreferrer">Open commit on GitHub</a>`
@@ -450,6 +450,7 @@ async function loadMarks() {
 
     marksList.innerHTML = '';
 
+    // Analytics counts are live-only per API response, derived from canonical Issues in this repo; liminal marks are classified as live-only.
     issues.forEach(issue => {
       const createdAt = issue?.created_at ? new Date(issue.created_at).toISOString().slice(0, 10) : 'unknown date';
       const snippet = truncateBody(issue?.body || '');
