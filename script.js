@@ -369,12 +369,27 @@ function createSignalPill(signalType) {
 async function loadMarks() {
   const marksList = document.getElementById('marks-list');
   const marksStatus = document.getElementById('marks-status');
+  const analytics = document.getElementById('marks-analytics');
+  const canonicalEl = document.getElementById('marks-count-canonical');
+  const mixedEl = document.getElementById('marks-count-mixed');
+  const liveEl = document.getElementById('marks-count-live');
+  const unknownEl = document.getElementById('marks-count-unknown');
 
   if (!marksList || !marksStatus) {
     return;
   }
 
+  const hasAnalytics = Boolean(analytics && canonicalEl && mixedEl && liveEl && unknownEl);
+
   marksStatus.textContent = 'Loading marks from GitHub…';
+
+  if (hasAnalytics) {
+    canonicalEl.textContent = '–';
+    mixedEl.textContent = '–';
+    liveEl.textContent = '–';
+    unknownEl.textContent = '–';
+    analytics.classList.remove('marks__analytics--loaded');
+  }
 
   try {
     const response = await fetch(GITHUB_ISSUES_URL, {
@@ -394,8 +409,17 @@ async function loadMarks() {
     if (!Array.isArray(issues) || issues.length === 0) {
       marksList.innerHTML = '';
       marksStatus.innerHTML = 'Marks are canonically stored as <a href="https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues" target="_blank" rel="noopener noreferrer">GitHub Issues in this repository</a>. This wall can appear empty when the GitHub API response is unavailable or filtered; you can browse marks directly on GitHub even if the wall cannot load them.';
+      if (hasAnalytics) {
+        canonicalEl.textContent = '0';
+        mixedEl.textContent = '0';
+        liveEl.textContent = '0';
+        unknownEl.textContent = '0';
+        analytics.classList.add('marks__analytics--loaded');
+      }
       return;
     }
+
+    const counts = { canonical: 0, mixed: 0, live: 0, unknown: 0 };
 
     marksList.innerHTML = '';
 
@@ -403,6 +427,12 @@ async function loadMarks() {
       const createdAt = issue?.created_at ? new Date(issue.created_at).toISOString().slice(0, 10) : 'unknown date';
       const snippet = truncateBody(issue?.body || '');
       const signalType = deriveSignalTypeFromIssue(issue);
+
+      if (signalType === 'canonical' || signalType === 'mixed' || signalType === 'live') {
+        counts[signalType] += 1;
+      } else {
+        counts.unknown += 1;
+      }
 
       const card = document.createElement('div');
       card.className = 'mark mark-card';
@@ -446,6 +476,14 @@ async function loadMarks() {
       card.append(meta, author, bodyText);
       marksList.appendChild(card);
     });
+
+    if (hasAnalytics) {
+      canonicalEl.textContent = String(counts.canonical);
+      mixedEl.textContent = String(counts.mixed);
+      liveEl.textContent = String(counts.live);
+      unknownEl.textContent = String(counts.unknown);
+      analytics.classList.add('marks__analytics--loaded');
+    }
   } catch (error) {
     marksStatus.textContent = 'Unable to load marks. Check your network connection or GitHub API rate limits.';
     console.error('Failed to load marks from GitHub Issues:', error);

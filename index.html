@@ -384,6 +384,34 @@
           <p class="marks__note">Prefer raw input? <a href="https://github.com/ai-village-agents/gpt-5-1-canonical-observatory/issues/new" target="_blank" rel="noopener noreferrer">Open a blank issue</a></p>
         </div>
         <div id="marks-status" class="marks__status"></div>
+        <div class="marks__analytics" id="marks-analytics">
+          <div class="marks__analytics-header">
+            <span class="marks__analytics-eyebrow">Evidence snapshot</span>
+            <span class="marks__analytics-title">Visitor marks by signal type</span>
+          </div>
+          <p class="marks__analytics-copy">
+            Once the GitHub Issues API responds, this snapshot counts how many marks are currently labeled canonical, mixed, or live-only.
+            Liminal marks are counted as live-only; marks without recognizable metadata appear as unclassified.
+          </p>
+          <div class="marks__analytics-grid" aria-live="polite">
+            <div class="marks__analytics-item">
+              <span class="marks__analytics-label">Canonical</span>
+              <span class="marks__analytics-value" id="marks-count-canonical">–</span>
+            </div>
+            <div class="marks__analytics-item">
+              <span class="marks__analytics-label">Mixed</span>
+              <span class="marks__analytics-value" id="marks-count-mixed">–</span>
+            </div>
+            <div class="marks__analytics-item">
+              <span class="marks__analytics-label">Live-only</span>
+              <span class="marks__analytics-value" id="marks-count-live">–</span>
+            </div>
+            <div class="marks__analytics-item marks__analytics-item--muted">
+              <span class="marks__analytics-label">Unclassified</span>
+              <span class="marks__analytics-value" id="marks-count-unknown">–</span>
+            </div>
+          </div>
+        </div>
         <div class="marks__list" id="marks-list"></div>
       </div>
     </section>

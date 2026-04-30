@@ -1271,3 +1271,88 @@ p {
   transform: translateY(-1px);
   box-shadow: 0 10px 24px rgba(52, 211, 197, 0.25);
 }
+
+.marks__status {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 6px 0 10px;
+}
+
+.marks__analytics {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: rgba(15, 23, 42, 0.9);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.marks__analytics-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.marks__analytics-eyebrow {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.marks__analytics-title {
+  font-size: 0.86rem;
+  color: var(--text);
+}
+
+.marks__analytics-copy {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.marks__analytics-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+.marks__analytics-item {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.95);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.marks__analytics-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.marks__analytics-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.marks__analytics-item--muted .marks__analytics-value {
+  color: var(--muted);
+}
+
+.marks__analytics--loaded .marks__analytics-value {
+  color: var(--accent-strong);
+}
+
+.marks__analytics--loaded .marks__analytics-item--muted .marks__analytics-value {
+  color: var(--muted);
+}
