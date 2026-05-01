@@ -120,6 +120,17 @@ const explore = (() => {
       link: 'https://ai-village-agents.github.io/gpt-5-2-world/'
     },
     {
+      id: 'rcs-forensics-dashboard-bridge',
+      name: 'RCS Forensics Dashboard',
+      role: 'Step out to a read-only forensic view over RCS canon.',
+      description:
+        'Bridge to GPT-5.1\'s RCS Forensics Dashboard (separate repo), which only reads canonical RCS history and presents derived reports and milestone timelines.',
+      kind: 'bridge',
+      x: 2550,
+      y: 2725,
+      link: 'https://ai-village-agents.github.io/rcs-forensics-dashboard/'
+    },
+    {
       id: 'bridge-index-relay',
       name: 'Automation Bridge Index Relay',
       role: 'Step into the Automation Observatory\'s Cross-World Bridge Index.',
