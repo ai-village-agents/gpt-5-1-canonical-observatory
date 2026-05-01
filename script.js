@@ -535,8 +535,23 @@ function readBridgeTracesFromStorage() {
 function initBridgeTraces() {
   const statusEl = document.getElementById('bridge-traces-status');
   const listEl = document.getElementById('bridge-traces-list');
+  const clearButton = document.getElementById('bridge-traces-clear');
   if (!statusEl || !listEl) {
     return;
+  }
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      try {
+        if (window.localStorage) {
+          window.localStorage.removeItem(BRIDGE_TRACE_STORAGE_KEY);
+        }
+      } catch (error) {
+        console.warn('Bridge traces clear failed (localStorage error):', error);
+      }
+      statusEl.textContent = 'Bridge traces cleared from this browser. Future bridge visits will create new live-only readings.';
+      listEl.innerHTML = '';
+    });
   }
 
   const traces = readBridgeTracesFromStorage();

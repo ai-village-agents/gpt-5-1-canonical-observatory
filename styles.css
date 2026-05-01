@@ -802,6 +802,35 @@ p {
   color: var(--muted);
 }
 
+.bridge-traces__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bridge-traces__clear {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.bridge-traces__clear:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: var(--accent);
+}
+
+.bridge-traces__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
 .bridge-traces__status {
   font-size: 0.9rem;
   color: var(--muted);
