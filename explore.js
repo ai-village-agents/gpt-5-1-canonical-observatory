@@ -257,6 +257,7 @@ const explore = (() => {
   let hudDetail;
   let coordDisplay;
   let nearbyDisplay;
+  let navCompassMeta;
   let minimapCanvas;
   let minimapCtx;
   let activeStation = null;
@@ -394,17 +395,71 @@ const explore = (() => {
     return hint ? `Nearest station: ${nearest.name} \u2014 ${hint}` : `Nearest station: ${nearest.name}`;
   }
 
+  function getNavigationCompassDomain(station) {
+    if (!station || !station.kind) {
+      return 'Unknown';
+    }
+
+    switch (station.kind) {
+      case 'rogue':
+      case 'cleric':
+      case 'warrior':
+      case 'ghost':
+        return 'RCS canon';
+      case 'instrument':
+        return 'Observatory canon';
+      case 'bridge':
+        return 'External worlds';
+      case 'live':
+        return 'Live-only overlays';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  function getNearestCompassLegend(nearest) {
+    const domain = getNavigationCompassDomain(nearest);
+    if (!nearest || !domain || domain === 'Unknown') {
+      return 'Navigation Compass: \u2014';
+    }
+
+    if (domain === 'RCS canon') {
+      return 'Navigation Compass: nearest station is in the RCS canon quadrant (archetype evidence).';
+    }
+
+    if (domain === 'Observatory canon') {
+      return 'Navigation Compass: nearest station is in the Observatory canon quadrant (instruments that may point at RCS or live-only overlays).';
+    }
+
+    if (domain === 'External worlds') {
+      return 'Navigation Compass: nearest station is in the External worlds quadrant (non-RCS bridges).';
+    }
+
+    if (domain === 'Live-only overlays') {
+      return 'Navigation Compass: nearest station is in the Live-only overlays quadrant (including liminal).';
+    }
+
+    return 'Navigation Compass: \u2014';
+  }
+
+  function syncCompassMetaDisplay(nearest) {
+    if (!navCompassMeta) return;
+    navCompassMeta.textContent = getNearestCompassLegend(nearest);
+  }
+
   function updateHudMeta() {
-    if (!coordDisplay && !nearbyDisplay) return;
+    const nearest = findNearestStation(observer.x, observer.y, Number.POSITIVE_INFINITY);
+    if (!coordDisplay && !nearbyDisplay && !navCompassMeta) return;
 
     if (coordDisplay) {
       coordDisplay.textContent = `Position: ${Math.round(observer.x)}, ${Math.round(observer.y)}`;
     }
 
     if (nearbyDisplay) {
-      const nearest = findNearestStation(observer.x, observer.y, Number.POSITIVE_INFINITY);
       nearbyDisplay.textContent = formatNearestStationText(nearest);
     }
+
+    syncCompassMetaDisplay(nearest);
   }
 
   function update(dt) {
@@ -660,6 +715,7 @@ const explore = (() => {
     hudDetail = document.getElementById('station-detail');
     coordDisplay = document.getElementById('coords-display');
     nearbyDisplay = document.getElementById('nearby-display');
+    navCompassMeta = document.getElementById('nav-compass-meta');
     minimapCanvas = document.getElementById('minimap-canvas');
     minimapCtx = minimapCanvas ? minimapCanvas.getContext('2d') : null;
     if (!canvas) return;
