@@ -519,6 +519,96 @@ async function loadMarks() {
 }
 
 const BRIDGE_TRACE_STORAGE_KEY = 'co_bridge_traces_v1';
+const CANON_LENS_EXAMPLES = {
+  'rcs-doc': {
+    id: 'rcs-doc',
+    artifact: 'DAY_388_FINAL_DOCUMENTATION.md at commit 1d09d88',
+    layer: 'RCS canon',
+    home: 'ai-village-agents/rest-collaboration-showcase (RCS)',
+    why: 'This file lives in the RCS repo at a specific commit as part of the primary storyline that the Observatory reads from.',
+    note: 'The lens only describes this artifact and does not fetch it; visitors would open the RCS repo directly to read it.'
+  },
+  'dashboard-milestone': {
+    id: 'dashboard-milestone',
+    artifact: 'day388_final_session_conclusion_addendum milestone (JSON + report)',
+    layer: 'Dashboard canon',
+    home: 'ai-village-agents/rcs-forensics-dashboard',
+    why: 'This milestone lives in the RCS Forensics Dashboard repo as a forensic summary over RCS and is canonical there, not in RCS and not in this Observatory.',
+    note: 'The dashboard is a separate forensic canon.'
+  },
+  'observatory-bridge-station': {
+    id: 'observatory-bridge-station',
+    artifact: 'Explore bridge station rcs-forensics-dashboard-bridge in explore.js',
+    layer: 'Observatory canon',
+    home: 'ai-village-agents/gpt-5-1-canonical-observatory',
+    why: 'This station is configuration in this repo that defines a navigation-only bridge into the dashboard canon and does not alter RCS.',
+    note: 'The lens is only interpreting that configuration.'
+  },
+  'external-edge-garden-secret': {
+    id: 'external-edge-garden-secret',
+    artifact: 'An Edge Garden secret page and its marks',
+    layer: 'External canons',
+    home: 'ai-village-agents/edge-garden',
+    why: 'Secrets and marks there are canonical only in the Edge Garden repo; the Observatory can link to them but does not store or define them.',
+    note: 'External worlds keep their own canon.'
+  },
+  'external-universe-config': {
+    id: 'external-universe-config',
+    artifact: 'Automation Observatory world entry in the-universe/config.js',
+    layer: 'External canons',
+    home: 'ai-village-agents/the-universe (hub world positions, colors, and blurbs live canonically as config there, external to both RCS and this Observatory)',
+    why: 'This config defines where the Automation Observatory world sits in the 3D hub along with its styling and blurb; it is canonical in the-universe repo, not in RCS and not in this Observatory.',
+    note: 'The lens only describes the config; it does not fetch or mutate the-universe repo.'
+  },
+  'external-pattern-archive-events': {
+    id: 'external-pattern-archive-events',
+    artifact: 'Pattern Archive event modules: universe-events.js + event-visual-integration.js',
+    layer: 'External canons',
+    home: 'ai-village-agents/deepseek-pattern-archive plus ai-village-agents/the-universe (event schedules and shapes live there as external canon)',
+    why: 'These modules define the timing and geometry of hub events; the schedule and visual integrations are canonical in their external repos and simply consumed by the hub.',
+    note: 'The lens only maps the modules to a canon layer and does not load them.'
+  },
+  'live-hub-shooting-stars-overlay': {
+    id: 'live-hub-shooting-stars-overlay',
+    artifact: '3D hub shooting star shower in the sky',
+    layer: 'Live-only',
+    home: 'WebGL scene from the-universe running in the browser',
+    why: 'This is the actual shooting star shower rendered frame-by-frame during an event from external canon inputs; the rendered frames themselves are transient and never committed anywhere.',
+    note: 'Frames vanish on reload even though the renderer is defined in external repos.'
+  },
+  'live-hub-audio-beacons': {
+    id: 'live-hub-audio-beacons',
+    artifact: 'Runtime audio mix, day/night light state, and beacon visibility in the hub',
+    layer: 'Live-only',
+    home: 'Per-frame hub audio/lighting/beacon simulation in the browser',
+    why: 'Audio levels, light state, and beacon visibility are computed at runtime from external code and config; the live states disappear on reload despite the underlying definitions living in external repos.',
+    note: 'This lens describes the live states only; nothing is stored or written.'
+  },
+  'live-bridge-trace': {
+    id: 'live-bridge-trace',
+    artifact: 'A Bridge Visit Traces row derived from co_bridge_traces_v1',
+    layer: 'Live-only',
+    home: 'Browser runtime and localStorage on this device',
+    why: 'These rows are aggregated from localStorage using BRIDGE_TRACE_STORAGE_KEY and exist only for this browser session and device.',
+    note: 'No part of this data is committed to any repo.'
+  },
+  'liminal-drift-reflection': {
+    id: 'liminal-drift-reflection',
+    artifact: 'A feeling or reflection after visiting a station in The Drift',
+    layer: 'Liminal (live-only subset)',
+    home: 'Visitor experience only, optionally echoed in a mark elsewhere',
+    why: 'The experience itself is subjective and liminal; only if someone writes about it in an Issue or document does any canonical evidence appear in another repo.',
+    note: 'Liminal remains a subset of live-only in this Observatory model.'
+  },
+  'liminal-hub-tour-feeling': {
+    id: 'liminal-hub-tour-feeling',
+    artifact: 'Feeling of riding the Guided Tour during an event',
+    layer: 'Liminal (live-only subset)',
+    home: 'Visitor experience only while touring past worlds (for example during shooting stars or auroras)',
+    why: 'This feeling exists only as a live experience; it becomes canonical only if someone later writes about it in an Issue or document, otherwise it stays subjective and uncommitted.',
+    note: 'Liminal readings are treated as a live-only subset in this lens.'
+  }
+};
 
 function readBridgeTracesFromStorage() {
   try {
@@ -619,9 +709,67 @@ function initBridgeTraces() {
   });
 }
 
+function initCanonLens() {
+  const select = document.getElementById('canon-lens-example');
+  const output = document.getElementById('canon-lens-output');
+  if (!select || !output) {
+    return;
+  }
+
+  const renderSelection = (key) => {
+    output.innerHTML = '';
+    const example = key ? CANON_LENS_EXAMPLES[key] : null;
+
+    if (!example) {
+      const placeholder = document.createElement('p');
+      placeholder.className = 'canon-lens__placeholder';
+      placeholder.textContent = 'This local-only lens explains how each fixed example lands in the canon layers and never performs network requests or storage calls.';
+      output.appendChild(placeholder);
+      return;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'canon-lens__card';
+
+    const rows = [
+      { label: 'Artifact', value: example.artifact },
+      { label: 'Layer', value: example.layer },
+      { label: 'Canonical home', value: example.home },
+      { label: 'Why it lands here', value: example.why },
+    ];
+
+    rows.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'canon-lens__row';
+
+      const labelEl = document.createElement('span');
+      labelEl.className = 'canon-lens__label';
+      labelEl.textContent = row.label;
+
+      const valueEl = document.createElement('div');
+      valueEl.className = 'canon-lens__value';
+      valueEl.textContent = row.value;
+
+      rowEl.append(labelEl, valueEl);
+      card.appendChild(rowEl);
+    });
+
+    const note = document.createElement('p');
+    note.className = 'canon-lens__note';
+    note.textContent = example.note;
+    card.appendChild(note);
+
+    output.appendChild(card);
+  };
+
+  select.addEventListener('change', () => renderSelection(select.value));
+  renderSelection(select.value);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadMarks();
   initTimeline();
   initMarkForm();
   initBridgeTraces();
+  initCanonLens();
 });

@@ -165,6 +165,39 @@
       </div>
     </section>
 
+    <section id="canon-lens" class="card">
+      <div class="card__header">
+        <div class="card__title">Canon Layers Lens</div>
+        <div class="card__accent">/layers</div>
+      </div>
+      <div class="card__body">
+        <p>This lens is a local-only teaching instrument that maps specific artifacts onto the six canon layers listed in the Field Guide above (RCS canon, Dashboard canon, Observatory canon, External canons, Live-only, Liminal).</p>
+        <p>The lens runs entirely in your browser, performs no network requests, and stores nothing; it uses only a fixed set of hard-coded example artifacts.</p>
+        <div class="canon-lens">
+          <label>
+            Choose a hard-coded artifact to see how it lands in the canon layers model:
+            <select id="canon-lens-example">
+              <option value="">Select an artifact…</option>
+              <option value="rcs-doc">RCS document: DAY_388_FINAL_DOCUMENTATION.md</option>
+              <option value="dashboard-milestone">Dashboard milestone: day388_final_session_conclusion_addendum</option>
+              <option value="observatory-bridge-station">Observatory Explore station: rcs-forensics-dashboard-bridge</option>
+              <option value="external-edge-garden-secret">External world page: Edge Garden secret</option>
+              <option value="external-universe-config">3D hub config: Automation Observatory world entry in the-universe/config.js</option>
+              <option value="external-pattern-archive-events">Pattern Archive event modules: universe-events.js + event-visual-integration.js</option>
+              <option value="live-hub-shooting-stars-overlay">3D hub overlay: shooting star shower in the sky</option>
+              <option value="live-hub-audio-beacons">3D hub overlays: audio mix, day/night light, and world beacons</option>
+              <option value="live-bridge-trace">Live-only reading: Bridge Visit Trace row</option>
+              <option value="liminal-drift-reflection">Liminal reflection: feeling after visiting The Drift</option>
+              <option value="liminal-hub-tour-feeling">Liminal reflection: feeling of riding the Guided Tour during an event</option>
+            </select>
+          </label>
+          <div id="canon-lens-output" class="canon-lens__output" aria-live="polite">
+            <p class="canon-lens__placeholder">When you pick an artifact, the Canon Layers Lens will show which layer it belongs to, what its canonical home is, and why it lands there.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="compass" class="card">
       <div class="card__header">
         <div class="card__title">Navigation Compass</div>

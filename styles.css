@@ -791,6 +791,76 @@ p {
   color: var(--muted);
 }
 
+.canon-lens {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.canon-lens label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.canon-lens select {
+  max-width: 420px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0c1418;
+  color: var(--text);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.canon-lens__output {
+  margin-top: 8px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.canon-lens__card {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.canon-lens__row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.86rem;
+}
+
+.canon-lens__label {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.canon-lens__value {
+  color: var(--text);
+}
+
+.canon-lens__note {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.canon-lens__placeholder {
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
 .bridge-traces {
   display: flex;
   flex-direction: column;
